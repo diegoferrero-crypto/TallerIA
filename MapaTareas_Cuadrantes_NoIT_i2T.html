@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Mapa de Tareas · i2T</title>
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --blue:#185FA5;--blue50:#E6F1FB;--blue100:#B5D4F4;--blue800:#0C447C;
+  --amber:#BA7517;--amber50:#FAEEDA;--amber100:#FAC775;--amber800:#633806;
+  --green:#3B6D11;--green50:#EAF3DE;--green100:#C0DD97;--green800:#27500A;
+  --red:#A32D2D;--red50:#FCEBEB;--red100:#F7C1C1;--red800:#791F1F;
+  --dark:#1A1F2E;
+}
+body{font-family:system-ui,-apple-system,sans-serif;background:#F5F6F8;min-height:100vh;padding-bottom:3rem;}
+
+.header{background:var(--dark);padding:1rem 1rem 0.875rem;color:#fff;}
+.header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.25rem;}
+.logo{font-size:10px;font-weight:600;letter-spacing:0.14em;color:rgba(255,255,255,0.4);text-transform:uppercase;}
+.badge{font-size:10px;font-weight:600;color:var(--blue100);background:rgba(21,95,165,0.25);padding:2px 8px;border-radius:20px;letter-spacing:0.06em;}
+.header h1{font-size:17px;font-weight:700;line-height:1.2;}
+.header p{font-size:12px;color:rgba(255,255,255,0.45);margin-top:2px;}
+
+.section{padding:0 1rem;margin-top:1.25rem;}
+.sec-label{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#888780;margin-bottom:8px;}
+
+/* PERFIL */
+.perfil-row{display:flex;gap:8px;align-items:center;}
+input.nombre{flex:1;padding:9px 12px;border:1px solid #D3D1C7;border-radius:8px;background:#fff;font-size:14px;font-family:inherit;outline:none;color:#1A1F2E;}
+input.nombre:focus{border-color:var(--blue);}
+
+.prof-row{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:8px;}
+.prof-btn{border:1px solid #D3D1C7;background:#fff;border-radius:8px;padding:8px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;-webkit-tap-highlight-color:transparent;transition:border-color .15s,background .15s;}
+.prof-btn i{font-size:18px;color:#888780;}
+.prof-btn span{font-size:11px;font-weight:500;color:#444441;text-align:center;line-height:1.2;}
+.prof-btn.on{border-color:var(--blue);background:var(--blue50);}
+.prof-btn.on i{color:var(--blue);}
+.prof-btn.on span{color:var(--blue800);}
+
+/* CUADRANTES */
+.cuadrantes-wrap{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:0;}
+.cuadrante{border-radius:10px;padding:10px;min-height:200px;display:flex;flex-direction:column;}
+.cuadrante.A{background:var(--blue50);border:1.5px solid var(--blue100);}
+.cuadrante.B{background:var(--amber50);border:1.5px solid var(--amber100);}
+.cuadrante.C{background:var(--green50);border:1.5px solid var(--green100);}
+.cuadrante.D{background:var(--red50);border:1.5px solid var(--red100);}
+
+.q-header{display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;}
+.q-letter{font-size:18px;font-weight:800;line-height:1;flex-shrink:0;}
+.cuadrante.A .q-letter{color:var(--blue800);}
+.cuadrante.B .q-letter{color:var(--amber800);}
+.cuadrante.C .q-letter{color:var(--green800);}
+.cuadrante.D .q-letter{color:var(--red800);}
+.q-meta{}
+.q-title{font-size:11px;font-weight:700;line-height:1.2;}
+.cuadrante.A .q-title{color:var(--blue800);}
+.cuadrante.B .q-title{color:var(--amber800);}
+.cuadrante.C .q-title{color:var(--green800);}
+.cuadrante.D .q-title{color:var(--red800);}
+.q-sub{font-size:10px;line-height:1.3;margin-top:2px;}
+.cuadrante.A .q-sub{color:var(--blue);}
+.cuadrante.B .q-sub{color:var(--amber);}
+.cuadrante.C .q-sub{color:var(--green);}
+.cuadrante.D .q-sub{color:var(--red);}
+
+/* EJEMPLOS chips */
+.ejemplos{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;}
+.ej-chip{font-size:10px;padding:3px 7px;border-radius:20px;cursor:pointer;-webkit-tap-highlight-color:transparent;border:1px solid transparent;line-height:1.3;transition:opacity .15s;}
+.cuadrante.A .ej-chip{background:#B5D4F4;color:var(--blue800);border-color:var(--blue100);}
+.cuadrante.B .ej-chip{background:var(--amber100);color:var(--amber800);border-color:#EF9F27;}
+.cuadrante.C .ej-chip{background:var(--green100);color:var(--green800);border-color:#97C459;}
+.cuadrante.D .ej-chip{background:var(--red100);color:var(--red800);border-color:#F09595;}
+.ej-chip.usado{opacity:0.35;pointer-events:none;text-decoration:line-through;}
+
+/* TAREAS en cuadrante */
+.q-tareas{flex:1;display:flex;flex-direction:column;gap:4px;}
+.q-tarea-item{display:flex;align-items:flex-start;gap:4px;background:rgba(255,255,255,0.7);border-radius:6px;padding:5px 6px;}
+.q-tarea-txt{flex:1;font-size:12px;line-height:1.4;color:#1A1F2E;word-break:break-word;}
+.q-del{background:none;border:none;cursor:pointer;padding:0;color:#B4B2A9;flex-shrink:0;display:flex;align-items:center;-webkit-tap-highlight-color:transparent;}
+.q-del i{font-size:13px;}
+
+/* INPUT en cuadrante */
+.q-input-row{display:flex;gap:4px;margin-top:6px;}
+.q-input{flex:1;padding:6px 8px;border:1px solid rgba(0,0,0,0.15);border-radius:6px;background:rgba(255,255,255,0.9);font-size:12px;font-family:inherit;outline:none;color:#1A1F2E;min-width:0;}
+.cuadrante.A .q-input:focus{border-color:var(--blue);}
+.cuadrante.B .q-input:focus{border-color:var(--amber);}
+.cuadrante.C .q-input:focus{border-color:var(--green);}
+.cuadrante.D .q-input:focus{border-color:var(--red);}
+.q-add{border:none;border-radius:6px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;}
+.cuadrante.A .q-add{background:var(--blue);color:#fff;}
+.cuadrante.B .q-add{background:var(--amber);color:#fff;}
+.cuadrante.C .q-add{background:var(--green);color:#fff;}
+.cuadrante.D .q-add{background:var(--red);color:#fff;}
+.q-add i{font-size:15px;}
+
+/* TOTALES */
+.totales-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px;}
+.tot-card{border-radius:8px;padding:8px 6px;text-align:center;}
+.tot-card.A{background:var(--blue50);}
+.tot-card.B{background:var(--amber50);}
+.tot-card.C{background:var(--green50);}
+.tot-card.D{background:var(--red50);}
+.tot-num{font-size:22px;font-weight:800;line-height:1;}
+.tot-card.A .tot-num{color:var(--blue800);}
+.tot-card.B .tot-num{color:var(--amber800);}
+.tot-card.C .tot-num{color:var(--green800);}
+.tot-card.D .tot-num{color:var(--red800);}
+.tot-lbl{font-size:9px;font-weight:600;margin-top:2px;}
+.tot-card.A .tot-lbl{color:var(--blue);}
+.tot-card.B .tot-lbl{color:var(--amber);}
+.tot-card.C .tot-lbl{color:var(--green);}
+.tot-card.D .tot-lbl{color:var(--red);}
+
+/* REFLEXION */
+.reflexion-box{background:#fff;border:1px solid #D3D1C7;border-radius:10px;padding:12px;}
+.refl-label{font-size:11px;font-weight:600;color:#5F5E5A;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;}
+textarea{width:100%;padding:8px 10px;border:1px solid #D3D1C7;border-radius:6px;font-size:13px;font-family:inherit;color:#1A1F2E;resize:none;outline:none;background:#FAFAFA;line-height:1.5;}
+textarea:focus{border-color:var(--blue);}
+.emoji-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.em-btn{font-size:22px;background:none;border:1.5px solid #D3D1C7;border-radius:8px;padding:5px 8px;cursor:pointer;-webkit-tap-highlight-color:transparent;line-height:1;transition:border-color .15s,background .15s;}
+.em-btn.on{border-color:var(--blue);background:var(--blue50);}
+
+/* EXPORT */
+.btn-export{width:100%;padding:13px;background:var(--dark);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;-webkit-tap-highlight-color:transparent;}
+.btn-export:active{opacity:0.85;}
+.exp-note{font-size:11px;color:#888780;text-align:center;margin-top:6px;}
+
+/* PRINT */
+@media print{
+  body{background:#fff;padding:0;}
+  .header{background:var(--dark)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .prof-row,.q-input-row,.btn-export,.exp-note,.emoji-row,.ejemplos,.section:has(.prof-row){display:none!important;}
+  .cuadrante,.tot-card,.reflexion-box{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .section{margin-top:0.75rem;}
+  .cuadrante{min-height:auto;}
+  .q-tarea-item{background:rgba(255,255,255,0.9)!important;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-row">
+    <span class="logo">i2T Talent Factory</span>
+    <span class="badge">Clase 1 · Track No-IT</span>
+  </div>
+  <h1>Mapa de tareas</h1>
+  <p>¿Cómo se relaciona la IA con tu trabajo?</p>
+</div>
+
+<div class="section">
+  <div class="sec-label">Tu perfil</div>
+  <input class="nombre" type="text" id="nombre" placeholder="Tu nombre y apellido">
+  <div class="prof-row" id="prof-row">
+    <button class="prof-btn" onclick="setProfesion(this,'contador')"
+      data-a='["Redactar carta a cliente","Sintetizar normativa AFIP","Armar informes estándar"]'
+      data-b='["Liquidar sueldos","Conciliar cuentas","Buscar jurisprudencia"]'
+      data-c='["Analizar cierre anual","Dictaminar sobre estados","Planificar carga fiscal"]'
+      data-d='["Firmar estados contables","Aconsejar ante litigio"]'>
+      <i class="ti ti-calculator"></i><span>Contador/a</span>
+    </button>
+    <button class="prof-btn" onclick="setProfesion(this,'arquitecto')"
+      data-a='["Redactar memoria descriptiva","Sintetizar acta de obra","Comparar especificaciones"]'
+      data-b='["Revisar pliego licitación","Analizar contratos","Chequear cómputo"]'
+      data-c='["Decidir sistema constructivo","Evaluar propuesta comitente"]'
+      data-d='["Firmar planos visados","Responsabilidad de obra"]'>
+      <i class="ti ti-building"></i><span>Arquitecto/a</span>
+    </button>
+    <button class="prof-btn" onclick="setProfesion(this,'comercializacion')"
+      data-a='["Armar presentación brief","Redactar informe competencia","Sintetizar encuesta"]'
+      data-b='["Analizar KPIs campaña","Comparar proveedores","Interpretar datos mercado"]'
+      data-c='["Definir estrategia precio","Decidir mix de medios"]'
+      data-d='["Negociar con cliente","Definir posicionamiento"]'>
+      <i class="ti ti-chart-bar"></i><span>Lic. Comercialización</span>
+    </button>
+    <button class="prof-btn" onclick="setProfesion(this,'otro')"
+      data-a='["Redactar informes","Sintetizar documentos","Traducir textos técnicos"]'
+      data-b='["Buscar normativa","Analizar contratos","Revisar datos"]'
+      data-c='["Evaluar situaciones","Tomar decisiones clave"]'
+      data-d='["Firmar documentos","Responsabilidad legal"]'>
+      <i class="ti ti-briefcase"></i><span>Otra profesión</span>
+    </button>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-label">Clasificá tus tareas en cada cuadrante</div>
+  <div class="cuadrantes-wrap">
+
+    <div class="cuadrante A" id="q-A">
+      <div class="q-header">
+        <span class="q-letter">A</span>
+        <div class="q-meta">
+          <div class="q-title">Alta confianza</div>
+          <div class="q-sub">IA asiste directo</div>
+        </div>
+      </div>
+      <div class="ejemplos" id="ej-A"></div>
+      <div class="q-tareas" id="tareas-A"></div>
+      <div class="q-input-row">
+        <input class="q-input" id="inp-A" placeholder="+ tarea..." onkeydown="ifEnter(event,'A')">
+        <button class="q-add" onclick="addTarea('A')" aria-label="Agregar en A"><i class="ti ti-plus"></i></button>
+      </div>
+    </div>
+
+    <div class="cuadrante B" id="q-B">
+      <div class="q-header">
+        <span class="q-letter">B</span>
+        <div class="q-meta">
+          <div class="q-title">Supervisión obligatoria</div>
+          <div class="q-sub">Vos verificás siempre</div>
+        </div>
+      </div>
+      <div class="ejemplos" id="ej-B"></div>
+      <div class="q-tareas" id="tareas-B"></div>
+      <div class="q-input-row">
+        <input class="q-input" id="inp-B" placeholder="+ tarea..." onkeydown="ifEnter(event,'B')">
+        <button class="q-add" onclick="addTarea('B')" aria-label="Agregar en B"><i class="ti ti-plus"></i></button>
+      </div>
+    </div>
+
+    <div class="cuadrante C" id="q-C">
+      <div class="q-header">
+        <span class="q-letter">C</span>
+        <div class="q-meta">
+          <div class="q-title">Mi criterio</div>
+          <div class="q-sub">IA apoya, decido yo</div>
+        </div>
+      </div>
+      <div class="ejemplos" id="ej-C"></div>
+      <div class="q-tareas" id="tareas-C"></div>
+      <div class="q-input-row">
+        <input class="q-input" id="inp-C" placeholder="+ tarea..." onkeydown="ifEnter(event,'C')">
+        <button class="q-add" onclick="addTarea('C')" aria-label="Agregar en C"><i class="ti ti-plus"></i></button>
+      </div>
+    </div>
+
+    <div class="cuadrante D" id="q-D">
+      <div class="q-header">
+        <span class="q-letter">D</span>
+        <div class="q-meta">
+          <div class="q-title">Sin IA</div>
+          <div class="q-sub">No aplica o no conviene</div>
+        </div>
+      </div>
+      <div class="ejemplos" id="ej-D"></div>
+      <div class="q-tareas" id="tareas-D"></div>
+      <div class="q-input-row">
+        <input class="q-input" id="inp-D" placeholder="+ tarea..." onkeydown="ifEnter(event,'D')">
+        <button class="q-add" onclick="addTarea('D')" aria-label="Agregar en D"><i class="ti ti-plus"></i></button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="totales-row">
+    <div class="tot-card A"><div class="tot-num" id="tot-A">0</div><div class="tot-lbl">Alta conf.</div></div>
+    <div class="tot-card B"><div class="tot-num" id="tot-B">0</div><div class="tot-lbl">Supervisión</div></div>
+    <div class="tot-card C"><div class="tot-num" id="tot-C">0</div><div class="tot-lbl">Mi criterio</div></div>
+    <div class="tot-card D"><div class="tot-num" id="tot-D">0</div><div class="tot-lbl">Sin IA</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-label">Reflexión</div>
+  <div class="reflexion-box">
+    <div class="refl-label">¿Qué descubrís al ver este mapa?</div>
+    <textarea id="reflexion" rows="3" placeholder="Una frase o dos es suficiente..."></textarea>
+    <div class="refl-label" style="margin-top:12px;">Tu emoji frente a la IA en tu trabajo</div>
+    <div class="emoji-row" id="emoji-row">
+      <button class="em-btn" onclick="setEmoji(this,'😨')">😨</button>
+      <button class="em-btn" onclick="setEmoji(this,'😰')">😰</button>
+      <button class="em-btn" onclick="setEmoji(this,'🤔')">🤔</button>
+      <button class="em-btn" onclick="setEmoji(this,'😄')">😄</button>
+      <button class="em-btn" onclick="setEmoji(this,'🤩')">🤩</button>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top:1.5rem;">
+  <button class="btn-export" onclick="exportar()">
+    <i class="ti ti-printer"></i> Guardar entregable / Imprimir
+  </button>
+  <p class="exp-note">Guardá como PDF desde el menú de impresión de tu celular</p>
+</div>
+
+<div style="height:2rem;"></div>
+
+<script>
+const tareas = {A:[],B:[],C:[],D:[]};
+let profActual = null;
+
+function setProfesion(btn, prof) {
+  document.querySelectorAll('.prof-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  profActual = prof;
+  ['A','B','C','D'].forEach(cat => {
+    const data = JSON.parse(btn.dataset[cat.toLowerCase()] || '[]');
+    renderEjemplos(cat, data);
+  });
+}
+
+function renderEjemplos(cat, lista) {
+  const cont = document.getElementById('ej-'+cat);
+  cont.innerHTML = '';
+  lista.forEach(txt => {
+    const chip = document.createElement('button');
+    chip.className = 'ej-chip';
+    chip.textContent = txt;
+    chip.title = 'Tocar para agregar esta tarea';
+    chip.onclick = () => {
+      const ya = tareas[cat].find(t => t === txt);
+      if (!ya) {
+        tareas[cat].push(txt);
+        chip.classList.add('usado');
+        renderTareas(cat);
+        actualizarTotales();
+      }
+    };
+    cont.appendChild(chip);
+  });
+}
+
+function addTarea(cat) {
+  const inp = document.getElementById('inp-'+cat);
+  const txt = inp.value.trim();
+  if (!txt) { inp.focus(); return; }
+  tareas[cat].push(txt);
+  inp.value = '';
+  renderTareas(cat);
+  actualizarTotales();
+}
+
+function ifEnter(e, cat) {
+  if (e.key === 'Enter') { e.preventDefault(); addTarea(cat); }
+}
+
+function renderTareas(cat) {
+  const cont = document.getElementById('tareas-'+cat);
+  cont.innerHTML = '';
+  tareas[cat].forEach((txt, i) => {
+    const item = document.createElement('div');
+    item.className = 'q-tarea-item';
+    item.innerHTML = `<span class="q-tarea-txt">${txt}</span>
+      <button class="q-del" onclick="delTarea('${cat}',${i})" aria-label="Eliminar">
+        <i class="ti ti-x"></i>
+      </button>`;
+    cont.appendChild(item);
+  });
+}
+
+function delTarea(cat, i) {
+  tareas[cat].splice(i, 1);
+  renderTareas(cat);
+  actualizarTotales();
+  if (profActual) {
+    const btn = document.querySelector('.prof-btn.on');
+    if (btn) renderEjemplos(cat, JSON.parse(btn.dataset[cat.toLowerCase()]||'[]'));
+  }
+}
+
+function actualizarTotales() {
+  ['A','B','C','D'].forEach(c => {
+    document.getElementById('tot-'+c).textContent = tareas[c].length;
+  });
+}
+
+function setEmoji(btn, em) {
+  document.querySelectorAll('.em-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+function exportar() {
+  const n = document.getElementById('nombre').value.trim() || 'Participante';
+  document.title = `Mapa de Tareas · ${n} · i2T`;
+  window.print();
+}
+</script>
+</body>
+</html>
