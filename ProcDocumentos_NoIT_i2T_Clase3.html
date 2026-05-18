@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Registro de Procesamiento · i2T</title>
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --blue:#185FA5;--blue50:#E6F1FB;--blue100:#B5D4F4;--blue800:#0C447C;
+  --amber:#BA7517;--amber50:#FAEEDA;--amber100:#FAC775;--amber800:#633806;
+  --green:#3B6D11;--green50:#EAF3DE;--green100:#C0DD97;--green800:#27500A;
+  --red:#A32D2D;--red50:#FCEBEB;--red100:#F7C1C1;
+  --purple:#5B2D8E;--purple50:#F0EAFA;--purple100:#C9B3E8;
+  --dark:#1A1F2E;--gray:#F1EFE8;--muted:#888780;--border:#D3D1C7;
+}
+body{font-family:system-ui,-apple-system,sans-serif;background:#F5F6F8;min-height:100vh;padding-bottom:3rem;}
+
+.header{background:var(--dark);padding:1rem 1.25rem 0.875rem;}
+.header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:.25rem;}
+.logo{font-size:10px;font-weight:600;letter-spacing:.14em;color:rgba(255,255,255,.4);text-transform:uppercase;}
+.badge{font-size:10px;font-weight:600;color:var(--blue100);background:rgba(21,95,165,.25);padding:2px 8px;border-radius:20px;}
+.header h1{font-size:18px;font-weight:700;color:#fff;line-height:1.2;}
+.header p{font-size:12px;color:rgba(255,255,255,.45);margin-top:2px;}
+.prog-bar{height:3px;background:rgba(255,255,255,.1);margin-top:.75rem;border-radius:2px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--blue);border-radius:2px;transition:width .4s;}
+.prog-text{font-size:10px;color:rgba(255,255,255,.4);margin-top:4px;text-align:right;}
+
+.section{padding:0 1.25rem;margin-top:1.25rem;}
+.sec-label{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+
+input.field,textarea.field{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;background:#fff;font-size:14px;font-family:inherit;outline:none;color:var(--dark);transition:border-color .15s;}
+input.field:focus,textarea.field:focus{border-color:var(--blue);}
+textarea.field{resize:none;line-height:1.6;}
+
+/* TIPO SELECTOR */
+.tipos-grid{display:flex;flex-direction:column;gap:6px;}
+.tipo-btn{border:1.5px solid var(--border);background:#fff;border-radius:8px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;-webkit-tap-highlight-color:transparent;transition:all .15s;text-align:left;}
+.tipo-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px;}
+.tipo-info .tipo-name{font-size:13px;font-weight:600;color:var(--dark);}
+.tipo-info .tipo-desc{font-size:11px;color:var(--muted);margin-top:1px;}
+
+.tipo-btn[data-t="extraccion"].on{border-color:var(--blue);background:var(--blue50);}
+.tipo-btn[data-t="extraccion"].on .tipo-icon{background:var(--blue);color:#fff;}
+.tipo-btn[data-t="extraccion"].on .tipo-name{color:var(--blue800);}
+
+.tipo-btn[data-t="sintesis"].on{border-color:var(--amber);background:var(--amber50);}
+.tipo-btn[data-t="sintesis"].on .tipo-icon{background:var(--amber);color:#fff;}
+.tipo-btn[data-t="sintesis"].on .tipo-name{color:var(--amber800);}
+
+.tipo-btn[data-t="comparacion"].on{border-color:var(--green);background:var(--green50);}
+.tipo-btn[data-t="comparacion"].on .tipo-icon{background:var(--green);color:#fff;}
+.tipo-btn[data-t="comparacion"].on .tipo-name{color:var(--green800);}
+
+.tipo-btn[data-t="inconsistencias"].on{border-color:var(--red);background:var(--red50);}
+.tipo-btn[data-t="inconsistencias"].on .tipo-icon{background:var(--red);color:#fff;}
+.tipo-btn[data-t="inconsistencias"].on .tipo-name{color:var(--red);}
+
+.tipo-btn[data-t="reunion"].on{border-color:var(--purple);background:var(--purple50);}
+.tipo-btn[data-t="reunion"].on .tipo-icon{background:var(--purple);color:#fff;}
+.tipo-btn[data-t="reunion"].on .tipo-name{color:var(--purple);}
+
+/* TEMPLATE hint */
+.template-hint{background:var(--gray);border-radius:8px;padding:10px 12px;margin-bottom:10px;display:none;}
+.template-hint.show{display:block;}
+.th-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px;}
+.th-text{font-size:12px;color:var(--dark);line-height:1.6;font-style:italic;}
+
+/* HALLAZGO CRÍTICO */
+.critico-block{background:var(--red50);border:1.5px solid var(--red100);border-radius:8px;padding:12px;}
+.critico-title{font-size:12px;font-weight:700;color:var(--red);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.prot-checks{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+.prot-check{display:flex;align-items:flex-start;gap:8px;cursor:pointer;}
+.prot-check input{width:16px;height:16px;margin-top:1px;flex-shrink:0;accent-color:var(--amber);}
+.prot-check span{font-size:12px;color:var(--amber800);line-height:1.4;}
+
+/* CARDS */
+.cards-list{display:flex;flex-direction:column;gap:10px;margin-top:8px;}
+.proc-card{background:#fff;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.pc-hdr{padding:10px 12px;display:flex;align-items:center;gap:8px;}
+.pc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.pc-info{flex:1;}
+.pc-doc{font-size:13px;font-weight:600;color:var(--dark);line-height:1.3;}
+.pc-tipo{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-top:1px;}
+.pc-body{padding:0 12px 12px;display:none;}
+.pc-body.open{display:block;}
+.pc-field{margin-bottom:8px;}
+.pc-field-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:3px;}
+.pc-field-val{font-size:13px;color:var(--dark);line-height:1.5;background:var(--gray);border-radius:6px;padding:8px 10px;}
+
+/* HALLAZGO exportable */
+.hallazgo-export{margin:0 12px 12px;border:1.5px solid var(--red);border-radius:8px;overflow:hidden;}
+.he-hdr{background:var(--red);padding:7px 12px;display:flex;align-items:center;justify-content:space-between;}
+.he-hdr span{font-size:11px;font-weight:700;color:#fff;letter-spacing:.06em;text-transform:uppercase;}
+.copy-btn{background:rgba(255,255,255,.2);border:none;color:#fff;font-size:11px;font-weight:600;padding:4px 10px;border-radius:5px;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:inherit;-webkit-tap-highlight-color:transparent;}
+.copy-btn:active{background:rgba(255,255,255,.35);}
+.he-text{padding:12px;background:var(--red50);font-size:13px;line-height:1.7;color:var(--dark);font-family:'Courier New',monospace;white-space:pre-wrap;word-break:break-word;}
+
+/* BTNS */
+.btn{width:100%;padding:12px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;-webkit-tap-highlight-color:transparent;}
+.btn:active{opacity:.85;}
+.btn-blue{background:var(--blue);color:#fff;}
+.btn-dark{background:var(--dark);color:#fff;}
+.icon-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:6px;display:flex;align-items:center;-webkit-tap-highlight-color:transparent;}
+
+.empty{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:13px;border:1.5px dashed var(--border);border-radius:8px;background:#fff;}
+.empty i{font-size:28px;display:block;margin-bottom:6px;opacity:.3;}
+
+/* CONFIDENCIALIDAD BANNER */
+.conf-banner{background:var(--amber50);border:1.5px solid var(--amber100);border-radius:8px;padding:12px;}
+.conf-title{font-size:12px;font-weight:700;color:var(--amber800);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.conf-rules{display:flex;flex-direction:column;gap:5px;}
+.conf-rule{font-size:12px;color:var(--amber800);line-height:1.4;display:flex;align-items:flex-start;gap:6px;}
+.conf-rule::before{content:'·';flex-shrink:0;margin-top:1px;}
+
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--dark);color:#fff;font-size:13px;font-weight:600;padding:10px 20px;border-radius:24px;transition:transform .25s;z-index:999;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+@media print{
+  body{background:#fff;}
+  .header{background:var(--dark)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .section:has(.tipos-grid),.section:has(.template-hint),.btn,.prog-bar,.prog-text,.icon-btn,.conf-banner{display:none!important;}
+  .pc-body{display:block!important;}
+  .hallazgo-export,.proc-card{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .copy-btn{display:none!important;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-row">
+    <span class="logo">i2T Talent Factory</span>
+    <span class="badge">Clase 3 · M2</span>
+  </div>
+  <h1>Procesamiento de Documentos</h1>
+  <p>IA Aplicada y Gobernanza · Track No-IT</p>
+  <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  <p class="prog-text" id="prog-text">0 registros · 0% completo</p>
+</div>
+
+<!-- CONFIDENCIALIDAD -->
+<div class="section">
+  <div class="conf-banner">
+    <div class="conf-title"><i class="ti ti-shield-lock" style="font-size:15px;"></i> Antes de cargar documentos</div>
+    <div class="conf-rules">
+      <div class="conf-rule">Datos personales de clientes o pacientes: anonimizar antes de cargar.</div>
+      <div class="conf-rule">Información estratégica confidencial: usar con Licencia Claude Team del programa.</div>
+      <div class="conf-rule">Regla práctica: si no lo publicarías en LinkedIn, preguntá si corresponde cargarlo.</div>
+    </div>
+  </div>
+</div>
+
+<!-- PERFIL -->
+<div class="section">
+  <div class="sec-label">Tu perfil</div>
+  <input class="field" type="text" id="nombre" placeholder="Nombre y apellido" oninput="updateProg()">
+  <div style="height:8px"></div>
+  <input class="field" type="text" id="doc-desc" placeholder="¿Qué documento vas a trabajar hoy?" oninput="updateProg()">
+</div>
+
+<!-- TIPO DE PROCESAMIENTO -->
+<div class="section">
+  <div class="sec-label">Tipo de procesamiento</div>
+  <div class="tipos-grid">
+    <button class="tipo-btn" data-t="extraccion" onclick="setTipo(this)">
+      <div class="tipo-icon"><i class="ti ti-filter"></i></div>
+      <div class="tipo-info"><div class="tipo-name">Extracción</div><div class="tipo-desc">Identificar elementos específicos: obligaciones, fechas, cláusulas, partes</div></div>
+    </button>
+    <button class="tipo-btn" data-t="sintesis" onclick="setTipo(this)">
+      <div class="tipo-icon"><i class="ti ti-list-check"></i></div>
+      <div class="tipo-info"><div class="tipo-name">Síntesis</div><div class="tipo-desc">Resumir manteniendo los puntos más críticos para el objetivo</div></div>
+    </button>
+    <button class="tipo-btn" data-t="comparacion" onclick="setTipo(this)">
+      <div class="tipo-icon"><i class="ti ti-git-diff"></i></div>
+      <div class="tipo-info"><div class="tipo-name">Comparación</div><div class="tipo-desc">Identificar diferencias, cambios y sus implicancias entre versiones</div></div>
+    </button>
+    <button class="tipo-btn" data-t="inconsistencias" onclick="setTipo(this)">
+      <div class="tipo-icon"><i class="ti ti-alert-triangle"></i></div>
+      <div class="tipo-info"><div class="tipo-name">Detección de inconsistencias</div><div class="tipo-desc">Contradicciones internas, ambigüedades, datos que no coinciden</div></div>
+    </button>
+    <button class="tipo-btn" data-t="reunion" onclick="setTipo(this)">
+      <div class="tipo-icon"><i class="ti ti-messages"></i></div>
+      <div class="tipo-info"><div class="tipo-name">Procesamiento de reunión</div><div class="tipo-desc">Extraer decisiones, compromisos, pendientes y acuerdos implícitos</div></div>
+    </button>
+  </div>
+</div>
+
+<!-- TEMPLATE DE PROMPT -->
+<div class="section">
+  <div class="sec-label">Template de prompt sugerido</div>
+  <div class="template-hint" id="template-hint">
+    <div class="th-label">Estructura recomendada</div>
+    <div class="th-text" id="template-text"></div>
+  </div>
+  <textarea class="field" id="prompt-usado" rows="4" placeholder="Escribí o pegá el prompt que usaste..." oninput="updateProg()"></textarea>
+</div>
+
+<!-- OUTPUT -->
+<div class="section">
+  <div class="sec-label">Output obtenido — resumen</div>
+  <textarea class="field" id="output" rows="4" placeholder="Resumí el output más importante que obtuvo la IA..." oninput="updateProg()"></textarea>
+</div>
+
+<!-- HALLAZGO CRÍTICO + PROTOCOLO -->
+<div class="section">
+  <div class="sec-label">Hallazgo crítico y verificación</div>
+  <div class="critico-block">
+    <div class="critico-title"><i class="ti ti-eye" style="font-size:14px;"></i> Protocolo de Repregunta aplicado</div>
+    <textarea class="field" id="hallazgo" rows="2" placeholder="¿Qué resultado te pareció más crítico o sorprendente?" style="background:#fff;" oninput="updateProg()"></textarea>
+    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--amber800);margin:8px 0 4px;">Preguntas que aplicaste</div>
+    <div class="prot-checks">
+      <label class="prot-check"><input type="checkbox" id="p1"><span>¿De dónde sacás esa afirmación?</span></label>
+      <label class="prot-check"><input type="checkbox" id="p2"><span>¿Qué pasa si este dato está desactualizado?</span></label>
+      <label class="prot-check"><input type="checkbox" id="p3"><span>¿Estás asumiendo algo que no te dije?</span></label>
+      <label class="prot-check"><input type="checkbox" id="p4"><span>¿Qué requiere validación profesional?</span></label>
+      <label class="prot-check"><input type="checkbox" id="p5"><span>¿Qué no me estás diciendo que podría ser relevante?</span></label>
+    </div>
+  </div>
+  <div style="height:8px"></div>
+  <div class="sec-label">¿Qué verificaste contra el documento original?</div>
+  <textarea class="field" id="verificacion" rows="2" placeholder="¿Coincidió? ¿La IA omitió algo? ¿Interpretó diferente?" oninput="updateProg()"></textarea>
+</div>
+
+<!-- APRENDIZAJE -->
+<div class="section">
+  <div class="sec-label">¿Qué aprendiste sobre los límites de la IA para documentos de tu disciplina?</div>
+  <textarea class="field" id="aprendizaje" rows="3" placeholder="Una o dos observaciones concretas sobre esta experiencia..." oninput="updateProg()"></textarea>
+</div>
+
+<!-- BTN GUARDAR -->
+<div class="section">
+  <button class="btn btn-blue" onclick="guardar()">
+    <i class="ti ti-device-floppy"></i> Guardar este procesamiento
+  </button>
+</div>
+
+<!-- REGISTROS -->
+<div class="section">
+  <div class="sec-label">Mis registros</div>
+  <div id="lista">
+    <div class="empty"><i class="ti ti-file-search"></i>Todavía no registraste ningún procesamiento.</div>
+  </div>
+</div>
+
+<!-- EXPORT -->
+<div class="section" style="margin-top:1.5rem;">
+  <button class="btn btn-dark" onclick="imprimir()">
+    <i class="ti ti-printer"></i> Guardar entregable / Imprimir
+  </button>
+  <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:6px;">Entregable NIT-M2 · guardá como PDF desde tu celular</p>
+</div>
+<div style="height:2rem;"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+let registros = [];
+let tipoActual = null;
+
+const TIPOS = {
+  extraccion:      { label:'Extracción',               dot:'185FA5', tc:'mt-blue',   icon:'ti-filter' },
+  sintesis:        { label:'Síntesis',                 dot:'BA7517', tc:'mt-amber',  icon:'ti-list-check' },
+  comparacion:     { label:'Comparación',              dot:'3B6D11', tc:'mt-green',  icon:'ti-git-diff' },
+  inconsistencias: { label:'Inconsistencias',          dot:'A32D2D', tc:'mt-red',    icon:'ti-alert-triangle' },
+  reunion:         { label:'Procesamiento de reunión', dot:'5B2D8E', tc:'mt-purple', icon:'ti-messages' },
+};
+
+const TEMPLATES = {
+  extraccion: 'Identificá todas las [obligaciones/fechas/cláusulas] en este documento.\nPara cada una indicá: origen (artículo o cláusula), si tiene plazo explícito o implícito, y consecuencias por incumplimiento.\nSeñalá si alguna es ambigua o requiere interpretación profesional.',
+  sintesis:   'Resumí este documento en [N] puntos ordenados por importancia para [objetivo concreto].\nPara cada punto, indicá en qué parte del documento se basa.\nSeñalá si alguna información podría estar incompleta o desactualizada.',
+  comparacion:'Comparé estas dos versiones e identificá:\n(a) qué cambió, (b) qué se eliminó, (c) qué se agregó, (d) qué implicancias tiene cada cambio.\nPresentalo en tabla: Versión 1 / Versión 2 / Implicancia.',
+  inconsistencias:'Revisá este documento e identificá:\n· Afirmaciones que se contradicen entre sí\n· Datos no consistentes con otros del mismo documento\n· Puntos ambiguos que podrían interpretarse de más de una manera\nPara cada caso, indicá dónde aparece y por qué es problemático.',
+  reunion:    'A partir de esta transcripción, extraé:\n(a) Las decisiones tomadas — con responsable y fecha si se mencionan\n(b) Los compromisos asumidos por cada participante\n(c) Los puntos que quedaron pendientes de resolución\n(d) Los acuerdos explícitos vs. los supuestos implícitos',
+};
+
+function setTipo(btn) {
+  document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  tipoActual = btn.dataset.t;
+  const hint = document.getElementById('template-hint');
+  const text = document.getElementById('template-text');
+  if (TEMPLATES[tipoActual]) {
+    text.textContent = TEMPLATES[tipoActual];
+    hint.classList.add('show');
+  }
+  updateProg();
+}
+
+function ensamblarHallazgo(r) {
+  const prot = r.protocolo.length
+    ? r.protocolo.map(n => ['¿De dónde sacás esa afirmación?','¿Qué pasa si este dato está desactualizado?','¿Estás asumiendo algo que no te dije?','¿Qué requiere validación profesional?','¿Qué no me estás diciendo que podría ser relevante?'][n-1]).join('\n· ')
+    : '—';
+
+  return [
+    `DOCUMENTO: ${r.docDesc}`,
+    `TIPO: ${TIPOS[r.tipo]?.label || r.tipo}`,
+    '',
+    `PROMPT UTILIZADO:\n${r.promptUsado}`,
+    '',
+    `OUTPUT CLAVE:\n${r.output}`,
+    '',
+    `HALLAZGO CRÍTICO:\n${r.hallazgo}`,
+    '',
+    `PROTOCOLO DE REPREGUNTA APLICADO:\n· ${prot}`,
+    '',
+    `VERIFICACIÓN CONTRA DOCUMENTO ORIGINAL:\n${r.verificacion || '—'}`,
+    '',
+    `APRENDIZAJE:\n${r.aprendizaje || '—'}`,
+  ].join('\n');
+}
+
+function guardar() {
+  const docDesc = document.getElementById('doc-desc').value.trim();
+  const promptUsado = document.getElementById('prompt-usado').value.trim();
+  const output = document.getElementById('output').value.trim();
+  const hallazgo = document.getElementById('hallazgo').value.trim();
+
+  if (!docDesc) { mostrarToast('Describí el documento primero'); return; }
+  if (!promptUsado) { mostrarToast('Completá el prompt que usaste'); return; }
+  if (!tipoActual) { mostrarToast('Elegí un tipo de procesamiento'); return; }
+
+  const r = {
+    id: Date.now(),
+    docDesc, tipo: tipoActual, promptUsado, output, hallazgo,
+    protocolo: [1,2,3,4,5].filter(i => document.getElementById('p'+i).checked),
+    verificacion: document.getElementById('verificacion').value.trim(),
+    aprendizaje: document.getElementById('aprendizaje').value.trim(),
+  };
+  r.exportText = ensamblarHallazgo(r);
+  registros.push(r);
+  renderLista();
+  limpiarForm();
+  updateProg();
+  mostrarToast('Procesamiento guardado ✓');
+}
+
+function renderLista() {
+  const lista = document.getElementById('lista');
+  lista.innerHTML = '';
+  if (!registros.length) {
+    lista.innerHTML = '<div class="empty"><i class="ti ti-file-search"></i>Todavía no registraste ningún procesamiento.</div>';
+    return;
+  }
+  registros.forEach((r, i) => {
+    const t = TIPOS[r.tipo] || TIPOS.extraccion;
+    const card = document.createElement('div');
+    card.className = 'proc-card';
+    card.innerHTML = `
+      <div class="pc-hdr" onclick="toggleCard(${r.id})">
+        <div class="pc-dot" style="background:#${t.dot};"></div>
+        <div class="pc-info">
+          <div class="pc-doc">${r.docDesc}</div>
+          <div class="pc-tipo" style="color:#${t.dot};">${t.label}</div>
+        </div>
+        <button class="icon-btn" onclick="event.stopPropagation();delReg(${i})" aria-label="Eliminar">
+          <i class="ti ti-x" style="font-size:15px;"></i>
+        </button>
+      </div>
+      <div class="hallazgo-export">
+        <div class="he-hdr">
+          <span><i class="ti ti-copy" style="font-size:11px;margin-right:4px;"></i>Registro exportable</span>
+          <button class="copy-btn" id="cb-${r.id}" onclick="copiar(${r.id})">
+            <i class="ti ti-clipboard" style="font-size:11px;"></i> Copiar
+          </button>
+        </div>
+        <div class="he-text">${escHtml(r.exportText)}</div>
+      </div>
+      <div class="pc-body" id="body-${r.id}">
+        ${r.promptUsado ? fieldRow('Prompt utilizado', r.promptUsado) : ''}
+        ${r.output ? fieldRow('Output obtenido', r.output) : ''}
+        ${r.hallazgo ? fieldRow('Hallazgo crítico', r.hallazgo) : ''}
+        ${r.verificacion ? fieldRow('Verificación', r.verificacion) : ''}
+        ${r.aprendizaje ? fieldRow('Aprendizaje', r.aprendizaje) : ''}
+      </div>
+      <div style="padding:0 12px 10px;">
+        <button class="btn" style="padding:7px;font-size:12px;background:var(--gray);color:var(--dark);border:none;" onclick="toggleCard(${r.id})">
+          <i class="ti ti-list-details" style="font-size:12px;"></i> Ver detalles
+        </button>
+      </div>
+    `;
+    lista.appendChild(card);
+  });
+}
+
+function fieldRow(lbl, txt) {
+  return `<div class="pc-field">
+    <div class="pc-field-lbl">${lbl}</div>
+    <div class="pc-field-val">${escHtml(txt)}</div>
+  </div>`;
+}
+
+function toggleCard(id) {
+  const b = document.getElementById('body-'+id);
+  if (b) b.classList.toggle('open');
+}
+
+function copiar(id) {
+  const r = registros.find(x => x.id === id);
+  if (!r) return;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(r.exportText).then(() => setCopied(id)).catch(() => copiarFallback(id, r.exportText));
+  } else copiarFallback(id, r.exportText);
+}
+function copiarFallback(id, txt) {
+  const ta = document.createElement('textarea');
+  ta.value = txt; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand('copy'); setCopied(id); } catch(e) {}
+  document.body.removeChild(ta);
+}
+function setCopied(id) {
+  const btn = document.getElementById('cb-'+id);
+  if (btn) { btn.innerHTML='<i class="ti ti-check" style="font-size:11px;"></i> Copiado'; setTimeout(()=>{ btn.innerHTML='<i class="ti ti-clipboard" style="font-size:11px;"></i> Copiar'; },2500); }
+  mostrarToast('Registro copiado ✓');
+}
+
+function delReg(i) { registros.splice(i,1); renderLista(); updateProg(); }
+
+function limpiarForm() {
+  ['doc-desc','prompt-usado','output','hallazgo','verificacion','aprendizaje'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value='';
+  });
+  document.querySelectorAll('.tipo-btn').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.prot-check input').forEach(cb=>cb.checked=false);
+  document.getElementById('template-hint').classList.remove('show');
+  tipoActual = null;
+}
+
+function updateProg() {
+  const nombre = document.getElementById('nombre').value.trim();
+  const doc = document.getElementById('doc-desc').value.trim();
+  const prompt = document.getElementById('prompt-usado').value.trim();
+  const aprendizaje = document.getElementById('aprendizaje').value.trim();
+  let score = 0;
+  if (nombre) score++;
+  if (doc) score++;
+  if (prompt) score++;
+  if (tipoActual) score++;
+  score += Math.min(registros.length, 3) * 2;
+  if (aprendizaje) score++;
+  const pct = Math.min(Math.round((score/11)*100), 100);
+  document.getElementById('prog-fill').style.width = pct+'%';
+  document.getElementById('prog-text').textContent = `${registros.length} registro${registros.length!==1?'s':''} · ${pct}% completo`;
+}
+
+function imprimir() {
+  const n = document.getElementById('nombre').value.trim() || 'Participante';
+  document.title = `Procesamiento de Documentos · ${n} · i2T`;
+  window.print();
+}
+
+function mostrarToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+function escHtml(t) {
+  return (t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+updateProg();
+</script>
+</body>
+</html>

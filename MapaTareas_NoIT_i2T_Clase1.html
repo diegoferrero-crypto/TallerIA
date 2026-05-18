@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Mapa de Tareas · i2T</title>
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue: #0B5FCC;
+    --blue-light: #EBF2FF;
+    --blue-mid: #B5D4F4;
+    --dark: #1A1F2E;
+    --amber: #B86B1A;
+    --amber-light: #FFF4E6;
+    --amber-mid: #FAC775;
+    --green: #3B6D11;
+    --green-light: #EAF3DE;
+    --green-mid: #C0DD97;
+    --red: #A32D2D;
+    --red-light: #FCEBEB;
+    --red-mid: #F7C1C1;
+    --gray: #5F5E5A;
+    --gray-light: #F1EFE8;
+    --gray-mid: #D3D1C7;
+    --text: #1A1F2E;
+    --text-muted: #5F5E5A;
+    --border: rgba(0,0,0,0.12);
+    --surface: #FFFFFF;
+    --bg: #F5F6F8;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  body {
+    font-family: 'DM Sans', 'Helvetica Neue', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 2rem;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--dark);
+    padding: 1.25rem 1.25rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+  .logo {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+  }
+  .clase-badge {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--blue);
+    background: rgba(11,95,204,0.2);
+    padding: 3px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+  }
+  .header h1 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+  }
+  .header p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 3px;
+  }
+
+  /* PROGRESS BAR */
+  .progress-bar {
+    height: 3px;
+    background: rgba(255,255,255,0.1);
+    margin-top: 0.75rem;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--blue);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+  .progress-text {
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    margin-top: 4px;
+    text-align: right;
+  }
+
+  /* SECTIONS */
+  .section {
+    padding: 0 1.25rem;
+    margin-top: 1.5rem;
+  }
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+  }
+
+  /* PROFESION SELECTOR */
+  .prof-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .prof-btn {
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 0.5rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .prof-btn i { font-size: 22px; color: var(--text-muted); }
+  .prof-btn span { font-size: 13px; font-weight: 500; color: var(--text); text-align: center; line-height: 1.2; }
+  .prof-btn.active {
+    border-color: var(--blue);
+    background: var(--blue-light);
+  }
+  .prof-btn.active i { color: var(--blue); }
+  .prof-btn.active span { color: var(--blue); }
+
+  /* NOMBRE */
+  .input-field {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    font-size: 15px;
+    color: var(--text);
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .input-field:focus { border-color: var(--blue); }
+
+  /* CATEGORIAS INFO */
+  .cat-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 1rem;
+  }
+  .cat-info {
+    border-radius: var(--radius-sm);
+    padding: 0.75rem;
+    border: 1px solid transparent;
+  }
+  .cat-info.A { background: var(--blue-light); border-color: var(--blue-mid); }
+  .cat-info.B { background: var(--amber-light); border-color: var(--amber-mid); }
+  .cat-info.C { background: var(--green-light); border-color: var(--green-mid); }
+  .cat-info.D { background: var(--red-light); border-color: var(--red-mid); }
+  .cat-letter {
+    font-size: 16px;
+    font-weight: 800;
+    margin-bottom: 2px;
+  }
+  .cat-info.A .cat-letter { color: var(--blue); }
+  .cat-info.B .cat-letter { color: var(--amber); }
+  .cat-info.C .cat-letter { color: var(--green); }
+  .cat-info.D .cat-letter { color: var(--red); }
+  .cat-title {
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .cat-info.A .cat-title { color: #0C447C; }
+  .cat-info.B .cat-title { color: #633806; }
+  .cat-info.C .cat-title { color: #27500A; }
+  .cat-info.D .cat-title { color: #791F1F; }
+  .cat-desc {
+    font-size: 10.5px;
+    line-height: 1.4;
+    margin-top: 3px;
+    opacity: 0.8;
+  }
+  .cat-info.A .cat-desc { color: #185FA5; }
+  .cat-info.B .cat-desc { color: #854F0B; }
+  .cat-info.C .cat-desc { color: #3B6D11; }
+  .cat-info.D .cat-desc { color: #A32D2D; }
+
+  /* TAREA FORM */
+  .add-tarea-form {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  .add-tarea-form .input-field {
+    margin-bottom: 0.75rem;
+    font-size: 14px;
+  }
+  .cat-selector {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-bottom: 0.75rem;
+  }
+  .cat-sel-btn {
+    padding: 0.5rem 0;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    text-align: center;
+  }
+  .cat-sel-btn[data-cat="A"].sel { background: var(--blue-light); border-color: var(--blue); color: var(--blue); }
+  .cat-sel-btn[data-cat="B"].sel { background: var(--amber-light); border-color: var(--amber); color: var(--amber); }
+  .cat-sel-btn[data-cat="C"].sel { background: var(--green-light); border-color: var(--green); color: var(--green); }
+  .cat-sel-btn[data-cat="D"].sel { background: var(--red-light); border-color: var(--red); color: var(--red); }
+  .btn-add {
+    width: 100%;
+    padding: 0.7rem;
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: opacity 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-add:active { opacity: 0.85; }
+
+  /* LISTA DE TAREAS */
+  .tareas-list { display: flex; flex-direction: column; gap: 8px; }
+  .tarea-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: slideIn 0.2s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .tarea-cat-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+  .tarea-cat-badge.A { background: var(--blue-light); color: var(--blue); }
+  .tarea-cat-badge.B { background: var(--amber-light); color: var(--amber); }
+  .tarea-cat-badge.C { background: var(--green-light); color: var(--green); }
+  .tarea-cat-badge.D { background: var(--red-light); color: var(--red); }
+  .tarea-texto { flex: 1; font-size: 14px; line-height: 1.4; color: var(--text); }
+  .btn-del {
+    background: none;
+    border: none;
+    color: var(--gray);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-del:active { background: var(--red-light); color: var(--red); }
+
+  .empty-state {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--text-muted);
+    font-size: 14px;
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+  .empty-state i { font-size: 32px; display: block; margin-bottom: 0.5rem; opacity: 0.3; }
+
+  /* RESUMEN */
+  .resumen-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 1rem;
+  }
+  .resumen-card {
+    border-radius: var(--radius-sm);
+    padding: 0.75rem;
+    text-align: center;
+  }
+  .resumen-card.A { background: var(--blue-light); }
+  .resumen-card.B { background: var(--amber-light); }
+  .resumen-card.C { background: var(--green-light); }
+  .resumen-card.D { background: var(--red-light); }
+  .resumen-num {
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1;
+  }
+  .resumen-card.A .resumen-num { color: var(--blue); }
+  .resumen-card.B .resumen-num { color: var(--amber); }
+  .resumen-card.C .resumen-num { color: var(--green); }
+  .resumen-card.D .resumen-num { color: var(--red); }
+  .resumen-label { font-size: 11px; font-weight: 600; margin-top: 3px; }
+  .resumen-card.A .resumen-label { color: #0C447C; }
+  .resumen-card.B .resumen-label { color: #633806; }
+  .resumen-card.C .resumen-label { color: #27500A; }
+  .resumen-card.D .resumen-label { color: #791F1F; }
+
+  /* REFLEXION */
+  .reflexion-area {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+  }
+  .reflexion-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.5rem;
+  }
+  textarea.input-field {
+    resize: none;
+    min-height: 80px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* BTN EXPORTAR */
+  .btn-export {
+    width: 100%;
+    padding: 1rem;
+    background: var(--dark);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    letter-spacing: 0.02em;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-export:active { opacity: 0.85; }
+  .export-note {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  /* PRINT */
+  @media print {
+    body { background: #fff; padding: 0; }
+    .header { position: static; background: var(--dark) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .add-tarea-form, .btn-export, .export-note, .btn-del, .prof-grid, .section:has(.prof-grid), .section:has(.add-tarea-form) { display: none !important; }
+    .tarea-cat-badge, .resumen-card, .cat-info { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .section { margin-top: 1rem; }
+    .header .progress-bar, .header .progress-text { display: none; }
+  }
+
+  /* Suggestions */
+  .suggestions {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .sug-chip {
+    font-size: 12px;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--surface);
+    color: var(--text-muted);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: all 0.15s;
+  }
+  .sug-chip:active { background: var(--blue-light); border-color: var(--blue); color: var(--blue); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <span class="logo">i2T Talent Factory</span>
+    <span class="clase-badge">Clase 1 · M1</span>
+  </div>
+  <h1>Mapa de Tareas</h1>
+  <p>IA Aplicada y Gobernanza · Track No-IT</p>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+  </div>
+  <p class="progress-text" id="progress-text">0 de 10 tareas sugeridas</p>
+</div>
+
+<!-- PASO 1: NOMBRE Y PROFESIÓN -->
+<div class="section" id="sec-perfil">
+  <div class="section-label">Tu perfil</div>
+  <input type="text" class="input-field" id="nombre-input" placeholder="Tu nombre y apellido" oninput="actualizarProgreso()">
+  <div style="height:10px"></div>
+  <div class="prof-grid" id="prof-grid">
+    <button class="prof-btn" onclick="selProf(this,'contador')" data-sugs='["Liquidar sueldos y jornales","Armar declaraciones juradas AFIP","Conciliar cuentas bancarias","Redactar informes a clientes","Analizar balances de cierre","Leer normativa impositiva actualizada","Preparar respuestas a intimaciones","Comparar versiones de contratos"]'>
+      <i class="ti ti-calculator"></i>
+      <span>Contador/a</span>
+    </button>
+    <button class="prof-btn" onclick="selProf(this,'arquitecto')" data-sugs='["Redactar memoria descriptiva","Leer pliegos de licitación","Escribir actas de reunión de obra","Preparar informes de avance","Analizar contratos con desarrolladores","Comparar especificaciones técnicas","Responder consultas del comitente","Revisar presupuestos de subcontratistas"]'>
+      <i class="ti ti-building"></i>
+      <span>Arquitecto/a</span>
+    </button>
+    <button class="prof-btn" onclick="selProf(this,'comercializacion')" data-sugs='["Redactar informes de mercado","Armar presentaciones para clientes","Analizar campañas de competencia","Preparar briefs de comunicación","Sintetizar reportes de resultados","Hacer seguimiento de indicadores","Documentar reuniones de equipo","Armar propuestas comerciales"]'>
+      <i class="ti ti-chart-bar"></i>
+      <span>Lic. Comercialización</span>
+    </button>
+    <button class="prof-btn" onclick="selProf(this,'otro')" data-sugs='["Redactar informes internos","Preparar presentaciones","Analizar documentos complejos","Sintetizar reuniones en actas","Responder correos extensos","Buscar y resumir normativa","Elaborar propuestas","Documentar procesos"]'>
+      <i class="ti ti-briefcase"></i>
+      <span>Otra profesión</span>
+    </button>
+  </div>
+</div>
+
+<!-- PASO 2: CATEGORÍAS -->
+<div class="section">
+  <div class="section-label">Las 4 categorías</div>
+  <div class="cat-cards">
+    <div class="cat-info A">
+      <div class="cat-letter">A</div>
+      <div class="cat-title">Alta confianza</div>
+      <div class="cat-desc">IA asiste directo, output confiable</div>
+    </div>
+    <div class="cat-info B">
+      <div class="cat-letter">B</div>
+      <div class="cat-title">Supervisión obligatoria</div>
+      <div class="cat-desc">IA asiste, vos verificás siempre</div>
+    </div>
+    <div class="cat-info C">
+      <div class="cat-letter">C</div>
+      <div class="cat-title">Criterio profesional</div>
+      <div class="cat-desc">IA apoya, decisión es tuya</div>
+    </div>
+    <div class="cat-info D">
+      <div class="cat-letter">D</div>
+      <div class="cat-title">Sin IA</div>
+      <div class="cat-desc">No aplica o no conviene</div>
+    </div>
+  </div>
+</div>
+
+<!-- PASO 3: AGREGAR TAREAS -->
+<div class="section" id="sec-agregar">
+  <div class="section-label">Agregá tus tareas</div>
+
+  <div class="add-tarea-form">
+    <input type="text" class="input-field" id="tarea-input" placeholder="Describí una tarea habitual..." maxlength="120">
+    <div class="cat-selector">
+      <button class="cat-sel-btn" data-cat="A" onclick="selCat(this)">A</button>
+      <button class="cat-sel-btn" data-cat="B" onclick="selCat(this)">B</button>
+      <button class="cat-sel-btn" data-cat="C" onclick="selCat(this)">C</button>
+      <button class="cat-sel-btn" data-cat="D" onclick="selCat(this)">D</button>
+    </div>
+    <button class="btn-add" onclick="agregarTarea()">
+      <i class="ti ti-plus"></i> Agregar tarea
+    </button>
+  </div>
+
+  <div id="sugerencias-container" style="display:none; margin-bottom:1rem;">
+    <div class="section-label" style="margin-bottom:6px">Sugerencias para tu profesión · tocá para agregar</div>
+    <div class="suggestions" id="sugerencias"></div>
+  </div>
+
+  <div id="tareas-list" class="tareas-list">
+    <div class="empty-state" id="empty-state">
+      <i class="ti ti-list-check"></i>
+      Todavía no agregaste ninguna tarea.<br>Objetivo: al menos 10.
+    </div>
+  </div>
+</div>
+
+<!-- PASO 4: RESUMEN -->
+<div class="section" id="sec-resumen">
+  <div class="section-label">Resumen de tu mapa</div>
+  <div class="resumen-grid">
+    <div class="resumen-card A">
+      <div class="resumen-num" id="cnt-A">0</div>
+      <div class="resumen-label">Alta confianza</div>
+    </div>
+    <div class="resumen-card B">
+      <div class="resumen-num" id="cnt-B">0</div>
+      <div class="resumen-label">Con supervisión</div>
+    </div>
+    <div class="resumen-card C">
+      <div class="resumen-num" id="cnt-C">0</div>
+      <div class="resumen-label">Mi criterio</div>
+    </div>
+    <div class="resumen-card D">
+      <div class="resumen-num" id="cnt-D">0</div>
+      <div class="resumen-label">Sin IA</div>
+    </div>
+  </div>
+</div>
+
+<!-- PASO 5: REFLEXIÓN -->
+<div class="section">
+  <div class="section-label">Reflexión inicial</div>
+  <div class="reflexion-area">
+    <div class="reflexion-label">¿Qué descubrís al ver este mapa?</div>
+    <textarea class="input-field" id="reflexion" placeholder="¿Qué te sorprendió? ¿Qué cambiarías en tu práctica? Una frase o dos es suficiente." oninput="actualizarProgreso()"></textarea>
+    <div style="height:12px"></div>
+    <div class="reflexion-label">¿Cuál es tu emoji frente a la IA en tu trabajo?</div>
+    <div style="display:flex; gap:10px; margin-top:6px; flex-wrap:wrap;" id="emoji-selector">
+      <button onclick="selEmoji(this,'😨')" style="font-size:24px; background:none; border:1.5px solid var(--border); border-radius:8px; padding:6px 10px; cursor:pointer; -webkit-tap-highlight-color:transparent;">😨</button>
+      <button onclick="selEmoji(this,'😰')" style="font-size:24px; background:none; border:1.5px solid var(--border); border-radius:8px; padding:6px 10px; cursor:pointer; -webkit-tap-highlight-color:transparent;">😰</button>
+      <button onclick="selEmoji(this,'🤔')" style="font-size:24px; background:none; border:1.5px solid var(--border); border-radius:8px; padding:6px 10px; cursor:pointer; -webkit-tap-highlight-color:transparent;">🤔</button>
+      <button onclick="selEmoji(this,'😄')" style="font-size:24px; background:none; border:1.5px solid var(--border); border-radius:8px; padding:6px 10px; cursor:pointer; -webkit-tap-highlight-color:transparent;">😄</button>
+      <button onclick="selEmoji(this,'🤩')" style="font-size:24px; background:none; border:1.5px solid var(--border); border-radius:8px; padding:6px 10px; cursor:pointer; -webkit-tap-highlight-color:transparent;">🤩</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXPORTAR -->
+<div class="section" style="margin-top:2rem;">
+  <button class="btn-export" onclick="exportar()">
+    <i class="ti ti-printer"></i> Guardar / Imprimir entregable
+  </button>
+  <p class="export-note">Se abre vista de impresión · guardá como PDF desde tu celular o computadora</p>
+</div>
+
+<div style="height:2rem"></div>
+
+<script>
+  let tareas = [];
+  let catSel = null;
+  let emojiSel = null;
+  let profSel = null;
+
+  function selProf(btn, prof) {
+    document.querySelectorAll('.prof-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    profSel = prof;
+    const sugs = JSON.parse(btn.dataset.sugs);
+    const cont = document.getElementById('sugerencias-container');
+    const lista = document.getElementById('sugerencias');
+    lista.innerHTML = '';
+    sugs.forEach(s => {
+      const chip = document.createElement('button');
+      chip.className = 'sug-chip';
+      chip.textContent = s;
+      chip.onclick = () => usarSugerencia(s, chip);
+      lista.appendChild(chip);
+    });
+    cont.style.display = 'block';
+    actualizarProgreso();
+  }
+
+  function usarSugerencia(texto, chip) {
+    document.getElementById('tarea-input').value = texto;
+    chip.style.opacity = '0.4';
+    chip.style.pointerEvents = 'none';
+  }
+
+  function selCat(btn) {
+    document.querySelectorAll('.cat-sel-btn').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+    catSel = btn.dataset.cat;
+  }
+
+  function selEmoji(btn, emoji) {
+    document.querySelectorAll('#emoji-selector button').forEach(b => {
+      b.style.borderColor = 'var(--border)';
+      b.style.background = 'none';
+    });
+    btn.style.borderColor = 'var(--blue)';
+    btn.style.background = 'var(--blue-light)';
+    emojiSel = emoji;
+    actualizarProgreso();
+  }
+
+  function agregarTarea() {
+    const input = document.getElementById('tarea-input');
+    const texto = input.value.trim();
+    if (!texto) { input.focus(); return; }
+    if (!catSel) { alert('Elegí una categoría (A, B, C o D) antes de agregar.'); return; }
+
+    tareas.push({ texto, cat: catSel });
+    input.value = '';
+    renderTareas();
+    actualizarProgreso();
+  }
+
+  function eliminarTarea(idx) {
+    tareas.splice(idx, 1);
+    renderTareas();
+    actualizarProgreso();
+  }
+
+  function renderTareas() {
+    const lista = document.getElementById('tareas-list');
+    const empty = document.getElementById('empty-state');
+
+    if (tareas.length === 0) {
+      lista.innerHTML = '';
+      lista.appendChild(empty);
+      empty.style.display = 'block';
+      ['A','B','C','D'].forEach(c => document.getElementById('cnt-'+c).textContent = '0');
+      return;
+    }
+
+    empty.style.display = 'none';
+    lista.innerHTML = '';
+
+    const counts = {A:0,B:0,C:0,D:0};
+    tareas.forEach((t, i) => {
+      counts[t.cat]++;
+      const item = document.createElement('div');
+      item.className = 'tarea-item';
+      item.innerHTML = `
+        <div class="tarea-cat-badge ${t.cat}">${t.cat}</div>
+        <div class="tarea-texto">${t.texto}</div>
+        <button class="btn-del" onclick="eliminarTarea(${i})" aria-label="Eliminar tarea">
+          <i class="ti ti-x" style="font-size:16px;"></i>
+        </button>`;
+      lista.appendChild(item);
+    });
+
+    ['A','B','C','D'].forEach(c => {
+      document.getElementById('cnt-'+c).textContent = counts[c];
+    });
+  }
+
+  function actualizarProgreso() {
+    const nombre = document.getElementById('nombre-input').value.trim();
+    const total = tareas.length;
+    const reflexion = document.getElementById('reflexion').value.trim();
+    let score = 0;
+    if (nombre) score += 1;
+    if (profSel) score += 1;
+    score += Math.min(total, 7);
+    if (reflexion) score += 1;
+    if (emojiSel) score += 1;
+    const pct = Math.round((score / 11) * 100);
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-text').textContent = `${total} tarea${total !== 1 ? 's' : ''} cargada${total !== 1 ? 's' : ''} · ${pct}% completo`;
+  }
+
+  function exportar() {
+    const nombre = document.getElementById('nombre-input').value.trim() || 'Participante';
+    document.title = `Mapa de Tareas · ${nombre} · i2T`;
+    window.print();
+  }
+
+  document.getElementById('tarea-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') agregarTarea();
+  });
+
+  actualizarProgreso();
+</script>
+</body>
+</html>

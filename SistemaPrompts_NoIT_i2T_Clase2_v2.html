@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Sistema de Prompts · i2T</title>
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --blue:#185FA5;--blue50:#E6F1FB;--blue100:#B5D4F4;--blue800:#0C447C;
+  --amber:#BA7517;--amber50:#FAEEDA;--amber100:#FAC775;--amber800:#633806;
+  --green:#3B6D11;--green50:#EAF3DE;--green100:#C0DD97;--green800:#27500A;
+  --red:#A32D2D;--red50:#FCEBEB;--red100:#F7C1C1;
+  --dark:#1A1F2E;--gray:#F1EFE8;--muted:#888780;--border:#D3D1C7;
+}
+body{font-family:system-ui,-apple-system,sans-serif;background:#F5F6F8;min-height:100vh;padding-bottom:3rem;}
+
+/* HEADER */
+.header{background:var(--dark);padding:1rem 1.25rem 0.875rem;}
+.header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:.25rem;}
+.logo{font-size:10px;font-weight:600;letter-spacing:.14em;color:rgba(255,255,255,.4);text-transform:uppercase;}
+.badge{font-size:10px;font-weight:600;color:var(--blue100);background:rgba(21,95,165,.25);padding:2px 8px;border-radius:20px;}
+.header h1{font-size:18px;font-weight:700;color:#fff;line-height:1.2;}
+.header p{font-size:12px;color:rgba(255,255,255,.45);margin-top:2px;}
+.prog-bar{height:3px;background:rgba(255,255,255,.1);margin-top:.75rem;border-radius:2px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--blue);border-radius:2px;transition:width .4s;}
+.prog-text{font-size:10px;color:rgba(255,255,255,.4);margin-top:4px;text-align:right;}
+
+/* SECTIONS */
+.section{padding:0 1.25rem;margin-top:1.25rem;}
+.sec-label{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+
+/* INPUTS */
+input.field,textarea.field{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;background:#fff;font-size:14px;font-family:inherit;outline:none;color:var(--dark);transition:border-color .15s;}
+input.field:focus,textarea.field:focus{border-color:var(--blue);}
+textarea.field{resize:none;line-height:1.6;}
+
+/* MODOS */
+.modos-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.modo-btn{border:1.5px solid var(--border);background:#fff;border-radius:8px;padding:10px;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;transition:all .15s;}
+.modo-btn .ml{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px;}
+.modo-btn .mn{font-size:13px;font-weight:600;color:var(--dark);}
+.modo-btn .md{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.3;}
+.modo-btn[data-m="generacion"].on{border-color:var(--blue);background:var(--blue50);}
+.modo-btn[data-m="generacion"].on .ml{color:var(--blue);}
+.modo-btn[data-m="analisis"].on{border-color:var(--amber);background:var(--amber50);}
+.modo-btn[data-m="analisis"].on .ml{color:var(--amber);}
+.modo-btn[data-m="transformacion"].on{border-color:var(--green);background:var(--green50);}
+.modo-btn[data-m="transformacion"].on .ml{color:var(--green);}
+.modo-btn[data-m="evaluacion"].on{border-color:var(--red);background:var(--red50);}
+.modo-btn[data-m="evaluacion"].on .ml{color:var(--red);}
+
+/* COMPONENTES */
+.comp-block{background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;}
+.comp-hdr{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.comp-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.n1{background:var(--blue50);color:var(--blue800);}
+.n2{background:var(--amber50);color:var(--amber800);}
+.n3{background:var(--green50);color:var(--green800);}
+.n4{background:var(--red50);color:var(--red);}
+.n5{background:var(--gray);color:var(--dark);}
+.comp-lbl{font-size:12px;font-weight:700;color:var(--dark);}
+.comp-hint{font-size:10px;color:var(--muted);margin-top:1px;}
+
+/* PROTOCOLO */
+.prot-block{background:var(--amber50);border:1.5px solid var(--amber100);border-radius:8px;padding:12px;}
+.prot-title{font-size:12px;font-weight:700;color:var(--amber800);margin-bottom:8px;}
+.prot-checks{display:flex;flex-direction:column;gap:6px;}
+.prot-check{display:flex;align-items:flex-start;gap:8px;cursor:pointer;}
+.prot-check input{width:16px;height:16px;margin-top:1px;flex-shrink:0;accent-color:var(--amber);}
+.prot-check span{font-size:12px;color:var(--amber800);line-height:1.4;}
+
+/* BTNS */
+.btn{width:100%;padding:12px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;-webkit-tap-highlight-color:transparent;transition:opacity .15s;}
+.btn:active{opacity:.85;}
+.btn-blue{background:var(--blue);color:#fff;}
+.btn-dark{background:var(--dark);color:#fff;}
+.btn-outline{background:#fff;color:var(--blue);border:1.5px solid var(--blue);}
+.btn-green{background:var(--green);color:#fff;}
+.btn-note{font-size:11px;color:var(--muted);text-align:center;margin-top:6px;}
+
+/* PROMPT CARDS */
+.prompts-list{display:flex;flex-direction:column;gap:10px;margin-top:8px;}
+.p-card{background:#fff;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.p-card-hdr{padding:10px 12px;display:flex;align-items:center;gap:8px;}
+.p-card-num{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;color:#fff;}
+.bg-g{background:var(--blue);}
+.bg-a{background:var(--amber);}
+.bg-t{background:var(--green);}
+.bg-e{background:var(--red);}
+.p-card-info{flex:1;}
+.p-card-tarea{font-size:13px;font-weight:600;color:var(--dark);line-height:1.3;}
+.p-card-modo{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-top:1px;}
+.mt-g{color:var(--blue);}
+.mt-a{color:var(--amber);}
+.mt-t{color:var(--green);}
+.mt-e{color:var(--red);}
+.p-card-actions{display:flex;gap:6px;padding:0 12px 10px;}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   PROMPT EXPORTABLE — pieza central
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.export-block{margin:0 12px 12px;border:1.5px solid var(--blue);border-radius:8px;overflow:hidden;display:none;}
+.export-block.open{display:block;}
+.export-header{background:var(--blue);padding:8px 12px;display:flex;align-items:center;justify-content:space-between;}
+.export-header span{font-size:11px;font-weight:700;color:#fff;letter-spacing:.06em;text-transform:uppercase;}
+.copy-btn{background:rgba(255,255,255,.2);border:none;color:#fff;font-size:11px;font-weight:600;padding:4px 10px;border-radius:5px;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:inherit;-webkit-tap-highlight-color:transparent;transition:background .15s;}
+.copy-btn:active{background:rgba(255,255,255,.35);}
+.copy-btn.copied{background:rgba(255,255,255,.35);}
+.export-text{padding:12px;background:var(--blue50);font-size:13px;line-height:1.7;color:#1a1f2e;font-family:'Courier New',monospace;white-space:pre-wrap;word-break:break-word;user-select:text;-webkit-user-select:text;}
+
+/* ICON BTN small */
+.icon-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:6px;display:flex;align-items:center;-webkit-tap-highlight-color:transparent;}
+.icon-btn:active{background:var(--red50);color:var(--red);}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:13px;border:1.5px dashed var(--border);border-radius:8px;background:#fff;}
+.empty i{font-size:28px;display:block;margin-bottom:6px;opacity:.3;}
+
+/* REFLEXION */
+.refl-box{background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--dark);color:#fff;font-size:13px;font-weight:600;padding:10px 20px;border-radius:24px;transition:transform .25s;z-index:999;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* PRINT */
+@media print{
+  body{background:#fff;}
+  .header{background:var(--dark)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .section:has(.modos-grid),.section:has(.comp-block),.btn,.btn-note,.prog-bar,.prog-text,.p-card-actions,.icon-btn{display:none!important;}
+  .export-block{display:block!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .export-text{font-size:11px;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-row">
+    <span class="logo">i2T Talent Factory</span>
+    <span class="badge">Clase 2 · NIT-M1</span>
+  </div>
+  <h1>Sistema de Prompts</h1>
+  <p>IA Aplicada y Gobernanza · Track No-IT</p>
+  <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  <p class="prog-text" id="prog-text">0 de 3 prompts · 0% completo</p>
+</div>
+
+<!-- PERFIL -->
+<div class="section">
+  <div class="sec-label">Tu perfil</div>
+  <input class="field" type="text" id="nombre" placeholder="Nombre y apellido" oninput="updateProg()">
+  <div style="height:8px"></div>
+  <input class="field" type="text" id="profesion" placeholder="Profesión / área de trabajo" oninput="updateProg()">
+</div>
+
+<!-- TAREA -->
+<div class="section">
+  <div class="sec-label">Tarea que resuelve este prompt</div>
+  <input class="field" type="text" id="tarea" placeholder="¿Qué tarea de tu Mapa vas a trabajar?">
+</div>
+
+<!-- MODO -->
+<div class="section">
+  <div class="sec-label">Modo de interacción</div>
+  <div class="modos-grid">
+    <button class="modo-btn" data-m="generacion" onclick="setModo(this)">
+      <div class="ml">Generación</div><div class="mn">Crear desde cero</div>
+      <div class="md">Borradores, estructuras, resúmenes</div>
+    </button>
+    <button class="modo-btn" data-m="analisis" onclick="setModo(this)">
+      <div class="ml">Análisis</div><div class="mn">Leer y extraer</div>
+      <div class="md">Documentos, normativas, expedientes</div>
+    </button>
+    <button class="modo-btn" data-m="transformacion" onclick="setModo(this)">
+      <div class="ml">Transformación</div><div class="mn">Convertir</div>
+      <div class="md">Tono, formato, audiencia, extensión</div>
+    </button>
+    <button class="modo-btn" data-m="evaluacion" onclick="setModo(this)">
+      <div class="ml">Evaluación</div><div class="mn">Revisar y juzgar</div>
+      <div class="md">Detectar problemas, comparar</div>
+    </button>
+  </div>
+</div>
+
+<!-- 5 COMPONENTES -->
+<div class="section">
+  <div class="sec-label">Los 5 componentes</div>
+
+  <div class="comp-block">
+    <div class="comp-hdr">
+      <div class="comp-num n1">1</div>
+      <div><div class="comp-lbl">Rol / Contexto</div>
+      <div class="comp-hint">¿Quién sos y en qué situación trabajás?</div></div>
+    </div>
+    <textarea class="field" id="c1" rows="2" placeholder="Ej: Soy contador/a en un estudio contable. Mi cliente es una PyME..." oninput="updateProg()"></textarea>
+  </div>
+
+  <div class="comp-block">
+    <div class="comp-hdr">
+      <div class="comp-num n2">2</div>
+      <div><div class="comp-lbl">Tarea</div>
+      <div class="comp-hint">¿Qué exactamente necesitás? Verbos precisos.</div></div>
+    </div>
+    <textarea class="field" id="c2" rows="2" placeholder="Ej: Resumí los puntos más importantes de este documento en 4 puntos concretos." oninput="updateProg()"></textarea>
+  </div>
+
+  <div class="comp-block">
+    <div class="comp-hdr">
+      <div class="comp-num n3">3</div>
+      <div><div class="comp-lbl">Restricciones</div>
+      <div class="comp-hint">¿Qué NO debe hacer ni asumir?</div></div>
+    </div>
+    <textarea class="field" id="c3" rows="2" placeholder="Ej: No uses términos técnicos sin explicarlos. No asumas que..."></textarea>
+  </div>
+
+  <div class="comp-block">
+    <div class="comp-hdr">
+      <div class="comp-num n4">4</div>
+      <div><div class="comp-lbl">Formato de salida</div>
+      <div class="comp-hint">¿Cómo querés el resultado? Tabla, lista, párrafo, extensión máxima.</div></div>
+    </div>
+    <textarea class="field" id="c4" rows="2" placeholder="Ej: Tabla con columnas: concepto, valor, observación. Máximo 10 filas."></textarea>
+  </div>
+
+  <div class="comp-block">
+    <div class="comp-hdr">
+      <div class="comp-num n5">5</div>
+      <div><div class="comp-lbl">Criterios de validación</div>
+      <div class="comp-hint">Pedile que señale sus incertidumbres o qué necesita verificación.</div></div>
+    </div>
+    <textarea class="field" id="c5" rows="2" placeholder="Ej: Al final, indicá qué datos requieren verificación antes de usar este output."></textarea>
+  </div>
+</div>
+
+<!-- PROTOCOLO -->
+<div class="section">
+  <div class="sec-label">Protocolo de Repregunta aplicado al output</div>
+  <div class="prot-block">
+    <div class="prot-title">¿Cuáles aplicaste?</div>
+    <div class="prot-checks">
+      <label class="prot-check"><input type="checkbox" id="p1"><span>¿De dónde sacás esa afirmación?</span></label>
+      <label class="prot-check"><input type="checkbox" id="p2"><span>¿Qué pasa si este dato está desactualizado?</span></label>
+      <label class="prot-check"><input type="checkbox" id="p3"><span>¿Estás asumiendo algo que no te dije?</span></label>
+      <label class="prot-check"><input type="checkbox" id="p4"><span>¿Qué requiere validación profesional?</span></label>
+      <label class="prot-check"><input type="checkbox" id="p5"><span>¿Qué no me estás diciendo que podría ser relevante?</span></label>
+    </div>
+  </div>
+  <div style="height:8px"></div>
+  <div class="sec-label">¿Qué cambió en la versión 2?</div>
+  <textarea class="field" id="iter" rows="2" placeholder="Ej: Agregué restricción sobre no asumir datos definitivos. El output mejoró en..."></textarea>
+</div>
+
+<!-- BTN GUARDAR -->
+<div class="section">
+  <button class="btn btn-blue" onclick="guardar()">
+    <i class="ti ti-device-floppy"></i> Guardar y generar prompt exportable
+  </button>
+</div>
+
+<!-- PROMPTS GUARDADOS -->
+<div class="section">
+  <div class="sec-label">Mis prompts</div>
+  <div id="lista">
+    <div class="empty" id="empty">
+      <i class="ti ti-copy"></i>
+      Todavía no guardaste ningún prompt.<br>Objetivo: al menos 3.
+    </div>
+  </div>
+</div>
+
+<!-- REFLEXION -->
+<div class="section">
+  <div class="sec-label">Reflexión del taller</div>
+  <div class="refl-box">
+    <textarea class="field" id="reflexion" rows="3" placeholder="¿Qué componente fue el más difícil de escribir? ¿Qué cambió entre v1 y v2?" oninput="updateProg()"></textarea>
+  </div>
+</div>
+
+<!-- IMPRIMIR -->
+<div class="section" style="margin-top:1.5rem;">
+  <button class="btn btn-dark" onclick="imprimir()">
+    <i class="ti ti-printer"></i> Guardar entregable / Imprimir
+  </button>
+  <p class="btn-note">Guardá como PDF · incluye los prompts listos para copiar</p>
+</div>
+
+<div style="height:2rem;"></div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+let prompts = [];
+let modoActual = null;
+
+const MODOS = {
+  generacion:    { label:'Generación',     bg:'bg-g', mt:'mt-g' },
+  analisis:      { label:'Análisis',       bg:'bg-a', mt:'mt-a' },
+  transformacion:{ label:'Transformación', bg:'bg-t', mt:'mt-t' },
+  evaluacion:    { label:'Evaluación',     bg:'bg-e', mt:'mt-e' },
+};
+
+// ── MODO ────────────────────────────────────────────────────
+function setModo(btn) {
+  document.querySelectorAll('.modo-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  modoActual = btn.dataset.m;
+  updateProg();
+}
+
+// ── ENSAMBLAR PROMPT ────────────────────────────────────────
+function ensamblarPrompt(pr) {
+  const partes = [];
+
+  if (pr.c1) partes.push(pr.c1.trim());
+
+  if (pr.c2) {
+    partes.push(pr.c2.trim());
+  }
+
+  if (pr.c3) {
+    partes.push(`Tené en cuenta las siguientes restricciones: ${pr.c3.trim()}`);
+  }
+
+  if (pr.c4) {
+    partes.push(`Presentá el resultado de la siguiente manera: ${pr.c4.trim()}`);
+  }
+
+  if (pr.c5) {
+    partes.push(pr.c5.trim());
+  }
+
+  return partes.join('\n\n');
+}
+
+// ── GUARDAR ────────────────────────────────────────────────
+function guardar() {
+  const tarea = document.getElementById('tarea').value.trim();
+  const c1    = document.getElementById('c1').value.trim();
+  const c2    = document.getElementById('c2').value.trim();
+
+  if (!tarea) { mostrarToast('Describí la tarea primero'); return; }
+  if (!c1 || !c2) { mostrarToast('Completá Rol (1) y Tarea (2) como mínimo'); return; }
+  if (!modoActual) { mostrarToast('Elegí un modo de interacción'); return; }
+
+  const pr = {
+    id: Date.now(),
+    tarea, modo: modoActual,
+    c1, c2,
+    c3: document.getElementById('c3').value.trim(),
+    c4: document.getElementById('c4').value.trim(),
+    c5: document.getElementById('c5').value.trim(),
+    protocolo: [1,2,3,4,5].filter(i => document.getElementById('p'+i).checked),
+    iter: document.getElementById('iter').value.trim(),
+    prompt: '',
+  };
+  pr.prompt = ensamblarPrompt(pr);
+
+  prompts.push(pr);
+  renderLista();
+  limpiarForm();
+  updateProg();
+
+  // Scroll al card recién guardado
+  setTimeout(() => {
+    const cards = document.querySelectorAll('.p-card');
+    if (cards.length) cards[cards.length-1].scrollIntoView({behavior:'smooth', block:'start'});
+  }, 100);
+
+  mostrarToast('Prompt guardado ✓');
+}
+
+// ── RENDER LISTA ────────────────────────────────────────────
+function renderLista() {
+  const lista = document.getElementById('lista');
+  lista.innerHTML = '';
+
+  if (prompts.length === 0) {
+    lista.innerHTML = '<div class="empty" id="empty"><i class="ti ti-copy"></i>Todavía no guardaste ningún prompt.<br>Objetivo: al menos 3.</div>';
+    return;
+  }
+
+  prompts.forEach((pr, i) => {
+    const m = MODOS[pr.modo] || MODOS.generacion;
+    const prot = pr.protocolo.length ? pr.protocolo.map(n=>`P${n}`).join(' · ') : '—';
+
+    const card = document.createElement('div');
+    card.className = 'p-card';
+    card.id = 'card-'+pr.id;
+
+    card.innerHTML = `
+      <div class="p-card-hdr">
+        <div class="p-card-num ${m.bg}">${i+1}</div>
+        <div class="p-card-info">
+          <div class="p-card-tarea">${pr.tarea}</div>
+          <div class="p-card-modo ${m.mt}">${m.label}</div>
+        </div>
+        <button class="icon-btn" onclick="delPrompt(${i})" aria-label="Eliminar">
+          <i class="ti ti-x" style="font-size:15px;"></i>
+        </button>
+      </div>
+
+      <!-- PROMPT EXPORTABLE — siempre visible -->
+      <div class="export-block open" id="exp-${pr.id}">
+        <div class="export-header">
+          <span><i class="ti ti-copy" style="font-size:12px;margin-right:4px;"></i>Prompt listo para copiar a Claude</span>
+          <button class="copy-btn" id="copybtn-${pr.id}" onclick="copiarPrompt(${pr.id})">
+            <i class="ti ti-clipboard" style="font-size:12px;"></i> Copiar
+          </button>
+        </div>
+        <div class="export-text" id="exptext-${pr.id}">${escapeHtml(pr.prompt)}</div>
+      </div>
+
+      <!-- DETALLES colapsables -->
+      <div class="p-card-actions">
+        <button class="btn btn-outline" style="flex:1;padding:7px;font-size:12px;" onclick="toggleDetalles(${pr.id})">
+          <i class="ti ti-list-details" style="font-size:13px;"></i> Ver componentes
+        </button>
+        ${pr.iter ? `<button class="btn" style="flex:1;padding:7px;font-size:12px;background:var(--green50);color:var(--green800);border:1px solid var(--green100);" onclick="toggleIter(${pr.id})">
+          <i class="ti ti-refresh" style="font-size:13px;"></i> Ver iteración
+        </button>` : ''}
+      </div>
+
+      <!-- Componentes (ocultos por defecto) -->
+      <div id="det-${pr.id}" style="display:none;padding:0 12px 12px;">
+        ${pr.c1 ? detalleRow('1 · Rol / Contexto', pr.c1) : ''}
+        ${pr.c2 ? detalleRow('2 · Tarea', pr.c2) : ''}
+        ${pr.c3 ? detalleRow('3 · Restricciones', pr.c3) : ''}
+        ${pr.c4 ? detalleRow('4 · Formato de salida', pr.c4) : ''}
+        ${pr.c5 ? detalleRow('5 · Criterios de validación', pr.c5) : ''}
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:8px;margin-bottom:3px;">Protocolo aplicado</div>
+        <div style="font-size:13px;color:var(--amber800);background:var(--amber50);border-radius:6px;padding:6px 10px;">${prot}</div>
+      </div>
+
+      <!-- Iteración (oculta por defecto) -->
+      ${pr.iter ? `<div id="iter-${pr.id}" style="display:none;padding:0 12px 12px;">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:3px;">¿Qué cambió en v2?</div>
+        <div style="font-size:13px;color:var(--green800);background:var(--green50);border-radius:6px;padding:8px 10px;line-height:1.5;">${escapeHtml(pr.iter)}</div>
+      </div>` : ''}
+    `;
+    lista.appendChild(card);
+  });
+}
+
+function detalleRow(lbl, txt) {
+  return `<div style="margin-bottom:6px;">
+    <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:2px;">${lbl}</div>
+    <div style="font-size:13px;color:var(--dark);background:var(--gray);border-radius:6px;padding:6px 10px;line-height:1.5;">${escapeHtml(txt)}</div>
+  </div>`;
+}
+
+function toggleDetalles(id) {
+  const el = document.getElementById('det-'+id);
+  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+function toggleIter(id) {
+  const el = document.getElementById('iter-'+id);
+  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+// ── COPIAR ────────────────────────────────────────────────
+function copiarPrompt(id) {
+  const pr = prompts.find(p => p.id === id);
+  if (!pr) return;
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(pr.prompt).then(() => {
+      setCopied(id);
+    }).catch(() => copiarFallback(id, pr.prompt));
+  } else {
+    copiarFallback(id, pr.prompt);
+  }
+}
+
+function copiarFallback(id, texto) {
+  const ta = document.createElement('textarea');
+  ta.value = texto;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try { document.execCommand('copy'); setCopied(id); } catch(e) {}
+  document.body.removeChild(ta);
+}
+
+function setCopied(id) {
+  const btn = document.getElementById('copybtn-'+id);
+  if (btn) {
+    btn.innerHTML = '<i class="ti ti-check" style="font-size:12px;"></i> Copiado';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.innerHTML = '<i class="ti ti-clipboard" style="font-size:12px;"></i> Copiar';
+      btn.classList.remove('copied');
+    }, 2500);
+  }
+  mostrarToast('Prompt copiado — pegalo en Claude ✓');
+}
+
+// ── ELIMINAR ────────────────────────────────────────────────
+function delPrompt(i) {
+  prompts.splice(i, 1);
+  renderLista();
+  updateProg();
+}
+
+// ── LIMPIAR FORM ────────────────────────────────────────────
+function limpiarForm() {
+  ['c1','c2','c3','c4','c5','tarea','iter'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.querySelectorAll('.modo-btn').forEach(b => b.classList.remove('on'));
+  document.querySelectorAll('.prot-check input').forEach(cb => cb.checked = false);
+  modoActual = null;
+}
+
+// ── PROGRESO ────────────────────────────────────────────────
+function updateProg() {
+  const nombre = document.getElementById('nombre').value.trim();
+  const prof   = document.getElementById('profesion').value.trim();
+  const refl   = document.getElementById('reflexion').value.trim();
+  const c1     = document.getElementById('c1').value.trim();
+  const c2     = document.getElementById('c2').value.trim();
+  let score = 0;
+  if (nombre) score++;
+  if (prof) score++;
+  if (c1) score++;
+  if (c2) score++;
+  score += Math.min(prompts.length, 3) * 2;
+  if (refl) score++;
+  const pct = Math.min(Math.round((score / 11) * 100), 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-text').textContent =
+    `${prompts.length} prompt${prompts.length !== 1 ? 's' : ''} guardado${prompts.length !== 1 ? 's' : ''} · ${pct}% completo`;
+}
+
+// ── IMPRIMIR ────────────────────────────────────────────────
+function imprimir() {
+  const nombre = document.getElementById('nombre').value.trim() || 'Participante';
+  document.title = `Sistema de Prompts · ${nombre} · i2T`;
+  window.print();
+}
+
+// ── TOAST ────────────────────────────────────────────────
+function mostrarToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ── UTILS ────────────────────────────────────────────────
+function escapeHtml(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+document.getElementById('c1').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) e.preventDefault(); });
+updateProg();
+</script>
+</body>
+</html>

@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Herramientas del Programa · i2T</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink:    #0F1218;
+  --ink2:   #1A1F2E;
+  --blue:   #1860B8;
+  --blue-l: #E6F1FB;
+  --amber:  #B86B10;
+  --amber-l:#FFF0DC;
+  --green:  #2E6010;
+  --green-l:#EAFADE;
+  --red:    #9C2222;
+  --red-l:  #FAEAEA;
+  --sand:   #F7F4EE;
+  --rule:   rgba(0,0,0,.08);
+  --radius: 12px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--sand);
+  color: var(--ink);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── HEADER ── */
+.site-header {
+  background: var(--ink2);
+  padding: 0 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.site-header .brand {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.55);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.brand-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--blue);
+  flex-shrink: 0;
+}
+.site-header .track-badge {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--blue);
+  background: rgba(24,96,184,.18);
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: .04em;
+}
+
+/* ── HERO ── */
+.hero {
+  padding: 4rem 2rem 3rem;
+  max-width: 860px;
+  margin: 0 auto;
+}
+.hero-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 1rem;
+}
+.hero h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.05;
+  color: var(--ink2);
+  margin-bottom: 1rem;
+}
+.hero h1 em {
+  font-style: normal;
+  color: var(--blue);
+}
+.hero p {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #555;
+  max-width: 560px;
+  font-weight: 300;
+}
+
+/* ── INSTRUCCIÓN ── */
+.instruccion {
+  max-width: 860px;
+  margin: 0 auto 3rem;
+  padding: 0 2rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+}
+.instruccion-icon {
+  width: 32px; height: 32px;
+  background: var(--blue-l);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 16px;
+  color: var(--blue);
+  margin-top: 1px;
+}
+.instruccion p {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #444;
+}
+.instruccion strong { color: var(--ink2); font-weight: 500; }
+
+/* ── CLASES ── */
+.clases {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ── CLASE CARD ── */
+.clase-card {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: #fff;
+  overflow: hidden;
+  animation: fadeUp .4s ease both;
+}
+.clase-card:nth-child(2) { animation-delay: .05s; }
+.clase-card:nth-child(3) { animation-delay: .10s; }
+.clase-card:nth-child(4) { animation-delay: .15s; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.clase-header {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  border-bottom: 1px solid var(--rule);
+}
+.clase-num {
+  width: 64px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem .5rem;
+}
+.clase-num .num {
+  font-family: 'Syne', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+}
+.clase-num .lbl {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-top: 3px;
+  opacity: .55;
+}
+.clase-meta {
+  flex: 1;
+  padding: 1.25rem 1.5rem;
+}
+.clase-meta h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink2);
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+.clase-meta .subtitulo {
+  font-size: 12.5px;
+  color: #888;
+  font-weight: 300;
+  font-style: italic;
+}
+.clase-modulo {
+  padding: .4rem 1rem;
+  display: flex;
+  align-items: center;
+  border-left: 1px solid var(--rule);
+  flex-shrink: 0;
+}
+.modulo-tag {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* Color themes per clase */
+.c1 .clase-num { background: var(--blue-l); }
+.c1 .clase-num .num { color: var(--blue); }
+.c1 .clase-num .lbl { color: var(--blue); }
+.c2 .clase-num { background: var(--amber-l); }
+.c2 .clase-num .num { color: var(--amber); }
+.c2 .clase-num .lbl { color: var(--amber); }
+.c3 .clase-num { background: var(--green-l); }
+.c3 .clase-num .num { color: var(--green); }
+.c3 .clase-num .lbl { color: var(--green); }
+.c4 .clase-num { background: var(--red-l); }
+.c4 .clase-num .num { color: var(--red); }
+.c4 .clase-num .lbl { color: var(--red); }
+
+.mt-m1 { background: rgba(24,96,184,.1); color: var(--blue); }
+.mt-m2 { background: rgba(184,107,16,.1); color: var(--amber); }
+
+/* ── HERRAMIENTAS GRID ── */
+.herramientas {
+  padding: 1rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.herr-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #999;
+  margin-bottom: 2px;
+}
+
+.herr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+}
+
+.herr-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: .875rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--rule);
+  background: var(--sand);
+  text-decoration: none;
+  color: var(--ink2);
+  transition: border-color .15s, background .15s, transform .12s;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.herr-card:hover {
+  border-color: rgba(24,96,184,.35);
+  background: #fff;
+  transform: translateY(-1px);
+}
+.herr-card:active { transform: translateY(0); }
+
+.herr-icon {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 17px;
+}
+.herr-info { flex: 1; min-width: 0; }
+.herr-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink2);
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+.herr-desc {
+  font-size: 11px;
+  color: #888;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.herr-arrow {
+  font-size: 14px;
+  color: #ccc;
+  flex-shrink: 0;
+  transition: color .15s, transform .15s;
+}
+.herr-card:hover .herr-arrow {
+  color: var(--blue);
+  transform: translateX(2px);
+}
+
+/* ── PRÓXIMAMENTE ── */
+.coming-soon {
+  border: 1.5px dashed var(--rule);
+  background: transparent;
+  opacity: .5;
+  cursor: default;
+  pointer-events: none;
+}
+.coming-soon:hover { transform: none; }
+.soon-tag {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  background: var(--rule);
+  color: #888;
+  padding: 2px 7px;
+  border-radius: 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── FOOTER ── */
+.site-footer {
+  border-top: 1px solid var(--rule);
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 860px;
+  margin: 0 auto;
+}
+.site-footer p {
+  font-size: 12px;
+  color: #aaa;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  .hero { padding: 2.5rem 1.25rem 2rem; }
+  .clases { padding: 0 1.25rem 3rem; }
+  .instruccion { margin: 0 1.25rem 2rem; }
+  .herr-grid { grid-template-columns: 1fr; }
+  .clase-modulo { display: none; }
+  .site-footer { flex-direction: column; gap: 6px; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="brand">
+    <div class="brand-dot"></div>
+    i2T Talent Factory
+  </div>
+  <span class="track-badge">Track No-IT · IA Aplicada y Gobernanza</span>
+</header>
+
+<section class="hero">
+  <div class="hero-label">Herramientas del programa</div>
+  <h1>Tu espacio de<br><em>trabajo en clase</em></h1>
+  <p>Acceso directo a las herramientas interactivas de cada clase. Completá, guardá e imprimí tus entregables desde acá.</p>
+</section>
+
+<div class="instruccion" style="max-width:860px;margin:0 auto 2rem;padding:1rem 1.25rem;">
+  <div class="instruccion-icon">💡</div>
+  <p>Las herramientas funcionan <strong>sin conexión a internet</strong> una vez cargadas. Guardá esta página en tus favoritos para acceder rápido durante las clases. Al terminar, usá el botón <strong>Imprimir / Guardar PDF</strong> dentro de cada herramienta para conservar tu entregable.</p>
+</div>
+
+<main class="clases">
+
+  <!-- CLASE 1 -->
+  <div class="clase-card c1">
+    <div class="clase-header">
+      <div class="clase-num">
+        <div class="num">1</div>
+        <div class="lbl">Clase</div>
+      </div>
+      <div class="clase-meta">
+        <h2>La IA sin tecnicismos</h2>
+        <div class="subtitulo">Qué es, qué hace, qué no puede hacer</div>
+      </div>
+      <div class="clase-modulo">
+        <span class="modulo-tag mt-m1">M1 · Tu trabajo, potenciado</span>
+      </div>
+    </div>
+    <div class="herramientas">
+      <div class="herr-label">Herramientas de esta clase</div>
+      <div class="herr-grid">
+
+        <a class="herr-card" href="MapaTareas_Cuadrantes_NoIT_i2T.html">
+          <div class="herr-icon" style="background:var(--blue-l);color:var(--blue);">🗂</div>
+          <div class="herr-info">
+            <div class="herr-name">Mapa de Tareas</div>
+            <div class="herr-desc">4 cuadrantes · clasificá tus tareas</div>
+          </div>
+          <span class="herr-arrow">→</span>
+        </a>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- CLASE 2 -->
+  <div class="clase-card c2">
+    <div class="clase-header">
+      <div class="clase-num">
+        <div class="num">2</div>
+        <div class="lbl">Clase</div>
+      </div>
+      <div class="clase-meta">
+        <h2>Prompts con criterio profesional</h2>
+        <div class="subtitulo">Cómo comunicarse con la IA</div>
+      </div>
+      <div class="clase-modulo">
+        <span class="modulo-tag mt-m1">M1 · Tu trabajo, potenciado</span>
+      </div>
+    </div>
+    <div class="herramientas">
+      <div class="herr-label">Herramientas de esta clase</div>
+      <div class="herr-grid">
+
+        <a class="herr-card" href="SistemaPrompts_NoIT_i2T_Clase2_v2.html">
+          <div class="herr-icon" style="background:var(--amber-l);color:var(--amber);">✍️</div>
+          <div class="herr-info">
+            <div class="herr-name">Sistema de Prompts</div>
+            <div class="herr-desc">5 componentes · entregable NIT-M1</div>
+          </div>
+          <span class="herr-arrow">→</span>
+        </a>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- CLASE 3 -->
+  <div class="clase-card c3">
+    <div class="clase-header">
+      <div class="clase-num">
+        <div class="num">3</div>
+        <div class="lbl">Clase</div>
+      </div>
+      <div class="clase-meta">
+        <h2>Procesamiento de documentos</h2>
+        <div class="subtitulo">Información compleja con criterio profesional</div>
+      </div>
+      <div class="clase-modulo">
+        <span class="modulo-tag mt-m2">M2 · Tus documentos, tus decisiones</span>
+      </div>
+    </div>
+    <div class="herramientas">
+      <div class="herr-label">Herramientas de esta clase</div>
+      <div class="herr-grid">
+
+        <a class="herr-card" href="ProcDocumentos_NoIT_i2T_Clase3.html">
+          <div class="herr-icon" style="background:var(--green-l);color:var(--green);">📄</div>
+          <div class="herr-info">
+            <div class="herr-name">Procesamiento de Documentos</div>
+            <div class="herr-desc">5 tipos · hallazgo crítico · NIT-M2</div>
+          </div>
+          <span class="herr-arrow">→</span>
+        </a>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- CLASES 4–6 PRÓXIMAMENTE -->
+  <div class="clase-card c4" style="opacity:.6;">
+    <div class="clase-header">
+      <div class="clase-num">
+        <div class="num" style="font-size:22px;color:#aaa;">4–6</div>
+        <div class="lbl" style="color:#aaa;">Clases</div>
+      </div>
+      <div class="clase-meta">
+        <h2 style="color:#aaa;">Decisiones · Riesgos · Proyecto integrador</h2>
+        <div class="subtitulo">Módulos 2 y 3 · en preparación</div>
+      </div>
+      <div class="clase-modulo">
+        <span class="modulo-tag" style="background:var(--rule);color:#aaa;">Próximamente</span>
+      </div>
+    </div>
+    <div class="herramientas">
+      <div class="herr-label">Herramientas de estas clases</div>
+      <div class="herr-grid">
+        <div class="herr-card coming-soon">
+          <div class="herr-icon" style="background:#f0f0ec;color:#bbb;">🧭</div>
+          <div class="herr-info">
+            <div class="herr-name">Mapa de Decisiones</div>
+            <div class="herr-desc">IA + criterio profesional · Clase 4</div>
+          </div>
+          <span class="soon-tag">Clase 4</span>
+        </div>
+        <div class="herr-card coming-soon">
+          <div class="herr-icon" style="background:#f0f0ec;color:#bbb;">🛡</div>
+          <div class="herr-info">
+            <div class="herr-name">Política de uso responsable</div>
+            <div class="herr-desc">Gobernanza · Clase 5</div>
+          </div>
+          <span class="soon-tag">Clase 5</span>
+        </div>
+        <div class="herr-card coming-soon">
+          <div class="herr-icon" style="background:#f0f0ec;color:#bbb;">🏁</div>
+          <div class="herr-info">
+            <div class="herr-name">Proyecto Integrador</div>
+            <div class="herr-desc">Certificación · Clase 6</div>
+          </div>
+          <span class="soon-tag">Clase 6</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  <p>i2T Talent Factory · Track No-IT · IA Aplicada y Gobernanza para Profesionales</p>
+  <p style="font-size:11px;color:#bbb;">Versión 1.0 · 2026</p>
+</footer>
+
+</body>
+</html>
