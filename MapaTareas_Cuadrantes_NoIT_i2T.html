@@ -131,12 +131,22 @@ textarea:focus{border-color:var(--blue);}
 @media print{
   body{background:#fff;padding:0;}
   .header{background:var(--dark)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  .prof-row,.q-input-row,.btn-export,.exp-note,.emoji-row,.ejemplos,.section:has(.prof-row){display:none!important;}
+  .prof-row,.q-input-row,.btn-export,.exp-note,.emoji-row,.ejemplos,.q-del,input.nombre{display:none!important;}
   .cuadrante,.tot-card,.reflexion-box{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
   .section{margin-top:0.75rem;}
   .cuadrante{min-height:auto;}
   .q-tarea-item{background:rgba(255,255,255,0.9)!important;}
+  .print-nombre{display:block!important;}
+  .print-emoji{display:flex!important;}
 }
+/* Sólo visibles al imprimir */
+.print-nombre{display:none;font-size:15px;font-weight:600;color:#1A1F2E;padding:4px 0 2px;}
+.print-emoji{display:none;align-items:center;gap:10px;margin-top:8px;padding:8px 12px;background:var(--blue50);border-radius:8px;border:1px solid var(--blue100);}
+.print-emoji .pe-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--blue800);}
+.print-emoji .pe-val{font-size:24px;line-height:1;}
+.print-emoji .pe-word{font-size:13px;color:var(--blue800);font-weight:500;}
+.print-prof{display:none;font-size:12px;color:#5F5E5A;margin-top:3px;font-style:italic;}
+@media print{ .print-prof{display:block!important;} }
 </style>
 </head>
 <body>
@@ -153,6 +163,13 @@ textarea:focus{border-color:var(--blue);}
 <div class="section">
   <div class="sec-label">Tu perfil</div>
   <input class="nombre" type="text" id="nombre" placeholder="Tu nombre y apellido">
+  <div class="print-nombre" id="print-nombre"></div>
+  <div class="print-emoji" id="print-emoji">
+    <span class="pe-label">Posición frente a la IA</span>
+    <span class="pe-val" id="pe-val"></span>
+    <span class="pe-word" id="pe-word"></span>
+  </div>
+  <div class="print-prof" id="print-prof"></div>
   <div class="prof-row" id="prof-row">
     <button class="prof-btn" onclick="setProfesion(this,'contador')"
       data-a='["Redactar carta a cliente","Sintetizar normativa AFIP","Armar informes estándar"]'
@@ -292,6 +309,8 @@ textarea:focus{border-color:var(--blue);}
 const tareas = {A:[],B:[],C:[],D:[]};
 let profActual = null;
 
+const PROF_LABELS = {'contador':'Contador/a','arquitecto':'Arquitecto/a','comercializacion':'Lic. Comercialización','otro':'Otra profesión'};
+
 function setProfesion(btn, prof) {
   document.querySelectorAll('.prof-btn').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
@@ -367,13 +386,19 @@ function actualizarTotales() {
   });
 }
 
+const EMOJI_WORDS = {'😨':'Miedo','😰':'Preocupación','🤔':'Incertidumbre','😄':'Entusiasmo','🤩':'Emoción total'};
+
 function setEmoji(btn, em) {
   document.querySelectorAll('.em-btn').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
+  document.getElementById('pe-val').textContent = em;
+  document.getElementById('pe-word').textContent = EMOJI_WORDS[em] || '';
 }
 
 function exportar() {
   const n = document.getElementById('nombre').value.trim() || 'Participante';
+  document.getElementById('print-nombre').textContent = n;
+  document.getElementById('print-prof').textContent = profActual ? PROF_LABELS[profActual] : '';
   document.title = `Mapa de Tareas · ${n} · i2T`;
   window.print();
 }
